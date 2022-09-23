@@ -52,6 +52,14 @@ class UserController extends Controller
 
     public function register(Request $request)
     {
+        //Mensajes de confirmacion de errores en las validaciones
+        $messages = [
+            'nombres.required' => 'Nombres es un campo Requerido',
+            'email.unique' => 'El correo electronico ya ha sido registrado',
+            'password.confirmed' => 'Las contraseñas no coinciden',
+        ];
+
+        //Usando el validator para verificar que los parametros enviados estes correctamente diligenciados
         $validator = Validator::make($request->all(), [
             'nombres' => 'required|string',
             'email' => 'required|string|email|unique:users',
@@ -62,12 +70,13 @@ class UserController extends Controller
             'direccion' => 'required|string|min:6',
             'telefono_principal' => 'required|string|min:6',
             'rol_id' => 'required',
-        ]);
+        ],$messages);
 
+        //Retorno de mensajes error al validar 
         if ($validator->fails()) {
             return response()->json($validator->errors()->toJson(), 400);
         }
-
+        //Creacion de usuario 
         $user = User::create([
             'nombres' => $request->get('nombres'),
             'email' => $request->get('email'),
@@ -82,6 +91,7 @@ class UserController extends Controller
             'rol_id' => $request->get('rol_id'),
         ]);
 
+        //Creacion de Token por usuario
         $token = JWTAuth::fromUser($user);
 
         return response()->json(compact('user', 'token'), 201);
