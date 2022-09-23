@@ -53,9 +53,15 @@ class UserController extends Controller
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
+            'nombres' => 'required|string',
+            'email' => 'required|string|email|unique:users',
             'password' => 'required|string|min:6|confirmed',
+            'identificacion' => 'required|string|min:10',
+            'genero' => 'string|min:1',
+            'apellidos' => 'required|string|min:6',
+            'direccion' => 'required|string|min:6',
+            'telefono_principal' => 'required|string|min:6',
+            'rol_id' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -63,9 +69,17 @@ class UserController extends Controller
         }
 
         $user = User::create([
-            'name' => $request->get('name'),
+            'nombres' => $request->get('nombres'),
             'email' => $request->get('email'),
             'password' => Hash::make($request->get('password')),
+            'identificacion' => $request->get('identificacion'),
+            'genero' => $request->get('genero'),
+            'apellidos' => $request->get('apellidos'),
+            'direccion' => $request->get('direccion'),
+            'fecha_nacimiento' => $request->get('fecha_nacimiento'),
+            'telefono_principal' => $request->get('telefono_principal'),
+            'telefono_alterno' => $request->get('telefono_alterno'),
+            'rol_id' => $request->get('rol_id'),
         ]);
 
         $token = JWTAuth::fromUser($user);

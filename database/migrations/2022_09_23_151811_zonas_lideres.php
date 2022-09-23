@@ -13,14 +13,12 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('zonas_lideres', function (Blueprint $table) {
             $table->id();
-            $table->string('nombres');
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
-            $table->rememberToken();
-            $table->timestamps();
+            $table->unsignedBigInteger('lider_id');
+            $table->unsignedBigInteger('zona_id');
+            $table->foreign('lider_id')->references('id')->on('users');
+            $table->foreign('zona_id')->references('id')->on('zonas');
         });
     }
 
@@ -31,6 +29,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('users');
+        //
     }
 };
