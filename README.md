@@ -4,11 +4,16 @@
 -Composer en su ultima version 
 -MySql 
 ## Pasos para el despliegue en Local 
-Clonar repositorio 
+Clonar repositorio  
+
 -Asegurese de  copiar el .env.example con el nombre .env
+
 -En el nuevo archivo configure su conexion a su servidor de BD local
+
 -La variable **DB_DATABASE** cambie su valor por **campein**
+
 -Luego dirijase a su servidor de BD y cree una BD vacia con ese mismo nombre (**campein**)
+
 ------------------------------------------------------------------------------------------
 -Abra una terminal en el Directorio raiz del proyecto 
 -Ejecute el comando **composer install** (El comando debe instalar todas las dependencias de PHP recordar en su version 8.1 o superior) 
