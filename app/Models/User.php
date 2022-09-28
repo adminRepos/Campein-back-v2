@@ -8,62 +8,42 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-use Tymon\JWTAuth\Contracts\JWTSubject;
-
-class User extends Authenticatable implements JWTSubject
+class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
-        'nombres',
+        'name',
         'email',
         'password',
-        'identificacion',
-        'genero',
-        'apellidos',
-        'fecha_nacimiento',
-        'direccion',
-        'telefono_principal',
-        'telefono_alterno',
-        'rol_id',
+        'telefono',
+        'identificacion'
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
 
-    //Relacion de uno a muchos Roles
-    function Roles(){
-        return $this->hasMany(Rol::class,'rol_id','id');
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
     }
 
-    /* METODOS JWT */
-    public function getJWTIdentifier()
-    {
-        return $this->getKey();
+    public function campeings() {
+        return $this->belongsToMany(Campeign::class);
     }
-    public function getJWTCustomClaims()
+
+    public function zonas() {
+        return $this->belongsToMany(Zone::class);
+    }
+
+    public function prospects()
     {
-        return [];
+        return $this->hasMany(Prospect::class);
     }
 }

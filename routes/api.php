@@ -2,27 +2,46 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\UserController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CampeignController;
+use App\Http\Controllers\CampeignsUsersController;
+use App\Http\Controllers\CausaController;
+use App\Http\Controllers\DonacionController;
+use App\Http\Controllers\EncuestaController;
+use App\Http\Controllers\EventoController;
+use App\Http\Controllers\GrupoInterezController;
+use App\Http\Controllers\PaisController;
+use App\Http\Controllers\PartidoPoliticoController;
+use App\Http\Controllers\PreguntaController;
+use App\Http\Controllers\ProspectoController;
+use App\Http\Controllers\RolController;
+use App\Http\Controllers\SubTerritorioController;
+use App\Http\Controllers\TerritorioController;
+use App\Http\Controllers\TipoTerritorioController;
+use App\Http\Controllers\ZonasUsersController;
+use App\Http\Controllers\ZonaController;
+use App\Http\Controllers\ZoneController;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| is assigned the "api" middleware group. Enjoy building your API!
-|
-*/
-/* __________________AUTENTICATION APIS______________________ */
-Route::post('/login', [UserController::class, 'authenticate']);
-Route::post('/register', [UserController::class, 'register']);
-
-/* __________________ROUTES PROTEGIDAS CON JWT______________________ */
-Route::group(['middleware' => ['jwt.verify']], function() {
-    Route::get('/getUser', [UserController::class, 'getAuthenticatedUser']);
-    Route::get('/searchUsers', [UserController::class, 'searchUsers']);
-    Route::get('/logout', [UserController::class, 'logout']);
-
+Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::resource('/campeign', CampeignController::class);
+    Route::resource('/campeign-user', CampeignsUsersController::class);
+    Route::resource('/causa', CausaController::class);
+    Route::resource('/donaciones', DonacionController::class);
+    Route::resource('/encuesta', EncuestaController::class);
+    Route::resource('/evento', EventoController::class);
+    Route::resource('/grupos-interez', GrupoInterezController::class);
+    Route::resource('/pais', PaisController::class);
+    Route::resource('/partido-politico', PartidoPoliticoController::class);
+    Route::resource('/pregunta', PreguntaController::class);
+    Route::resource('/prospecto', ProspectoController::class);
+    Route::resource('/rol', RolController::class);
+    Route::resource('/sub-territorios', SubTerritorioController::class);
+    Route::resource('/territorios', TerritorioController::class);
+    Route::resource('/tipo-territorios', TipoTerritorioController::class);
+    Route::resource('/zonas', ZonasUsersController::class);
+    Route::resource('/zonas', ZonaController::class);
+    Route::resource('/zonas', ZoneController::class);
 });
 
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
