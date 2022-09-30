@@ -41,6 +41,10 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::resource('/zonas', ZonasUsersController::class);
     Route::resource('/zonas', ZonaController::class);
     Route::resource('/zonas', ZoneController::class);
+
+    Route::get('/getUsers', [AuthController::class, 'getUsers']);
+    Route::get('/getUser', [AuthController::class, 'getUser']);
+    // Route::get('/perfil-usuario', [UsuarioController::class], 'getUser');
 });
 
 Route::post('/register', [AuthController::class, 'register']);
