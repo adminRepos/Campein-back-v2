@@ -18,6 +18,7 @@ use App\Http\Controllers\RolController;
 use App\Http\Controllers\SubTerritorioController;
 use App\Http\Controllers\TerritorioController;
 use App\Http\Controllers\TipoTerritorioController;
+use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\ZonasUsersController;
 use App\Http\Controllers\ZonaController;
 use App\Http\Controllers\ZoneController;
@@ -42,8 +43,13 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::resource('/zonas', ZonaController::class);
     Route::resource('/zonas', ZoneController::class);
 
-    Route::get('/getUsers', [AuthController::class, 'getUsers']);
-    Route::get('/getUser', [AuthController::class, 'getUser']);
+    Route::get('/getSession', [AuthController::class, 'getSession']);
+    
+    
+    Route::post('/getPrivilegios', [UsuarioController::class, 'getPrivilegios']);
+    Route::get('/getUser', [UsuarioController::class, 'getUser']);
+    Route::get('/getUsers', [UsuarioController::class, 'getUsers']);
+    Route::get('/getRoles', [UsuarioController::class, 'getRoles']);
     // Route::get('/perfil-usuario', [UsuarioController::class], 'getUser');
 });
 

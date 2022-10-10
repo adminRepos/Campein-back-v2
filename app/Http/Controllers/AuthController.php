@@ -5,9 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use App\Http\Requests\UserAuthRequest;
-use App\Http\Requests\UserRegisterRequest;
+use App\Models\Role;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
@@ -17,7 +17,8 @@ class AuthController extends Controller
   public function register(Request $request)
   {
     $requestValidate = $request->validate([
-      'name' => 'required|string',
+      'nombre' => 'required|string',
+      'rol_id' => 'required',
       'email' => 'required|string|email|unique:users',
       'password' => 'required|string|min:12',
       'telefono' => 'required|string|min:5|max:16',
@@ -25,7 +26,8 @@ class AuthController extends Controller
     ]);
 
     $newUser = User::create([
-      'name' => $requestValidate['name'],
+      'nombre' => $requestValidate['nombre'],
+      'rol_id' => $requestValidate['rol_id'],
       'email' => $requestValidate['email'],
       'password' => Hash::make($requestValidate['password']),
       'telefono' => $requestValidate['telefono'],
@@ -62,20 +64,14 @@ class AuthController extends Controller
     return response()->json([
       'access_token' => $authToken,
       'token_type' => 'Bearer',
+      'user' => auth()->user()
     ], 200);
   }
 
-  public function getUsers(Request $request)
-  {
+  public function getSession(Request $request){
     return response()->json([
-      'data' => User::get(),
+      'data' => auth()->user(),
     ], 200);
   }
-
-  public function getUser(Request $request)
-  {
-    return response()->json([
-      'data' => ['user' => auth()->user()],
-    ], 200);
-  }
+  
 }
