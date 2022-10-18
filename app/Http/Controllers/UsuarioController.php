@@ -33,9 +33,19 @@ class UsuarioController extends Controller
 
   public function getUsers(Request $request)
   {
-    return response()->json([
-      'data' => User::get(),
-    ], 200);
+    $rol_id = intval($request->rol_id);
+    if($rol_id == 1){
+      return response()->json([
+        'data' => DB::select('CALL sp_get_users_super()'),
+      ], 200);
+    }else{
+      return response()->json([
+        'data' => DB::select('CALL sp_get_users_campeing('.$rol_id.')'),
+      ], 200);
+    }
+      // return response()->json([
+      //   'data' => $rol_id,
+      // ], 200);
   }
 
   public function getPrivilegios(Request $request){

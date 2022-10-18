@@ -48,7 +48,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     
     Route::post('/getPrivilegios', [UsuarioController::class, 'getPrivilegios']);
     Route::get('/getUser', [UsuarioController::class, 'getUser']);
-    Route::get('/getUsers', [UsuarioController::class, 'getUsers']);
+    Route::get('/getUsers/{rol_id}', [UsuarioController::class, 'getUsers']);
     Route::get('/getRoles', [UsuarioController::class, 'getRoles']);
     // Route::get('/perfil-usuario', [UsuarioController::class], 'getUser');
 });
