@@ -66,43 +66,77 @@ class ProspectoController extends Controller
         //
     }
 
+    /**
+     * Registrar prospecto e intereces del prospecto
+     *
+     * @author Victor Vivas
+     */
     public function insertProspecto(Request $request){
-        $identificacion = $request->identificacion;
-        $genero = $request->genero;
-        $primerNombre = $request->primerNombre;
-        $segundoNombre = $request->segundoNombre;
-        $primerApellido = $request->primerApellido;
-        $segundoApellido = $request->segundoApellido;
-        $direccion = $request->direccion;
-        $email = $request->email;
-        $telefono = $request->telefono;
-        $whatsapp = $request->whatsapp;
-        $user_id = $request->user_id;
-        $rangoEdad = $request->rangoEdad;
-        $longitud = $request->longitud;
-        $latitud = $request->latitud;
-        $intereces = $request->intereces;
-
-        $strQuery = "CALL insertProspecto(" 
-            . "'" . $identificacion . "', " 
-            . "'" . $genero . "', " 
-            . "'" . $primerNombre . "', ";
-        $strQuery .= $segundoNombre == null ? "NULL," : "'" . $segundoNombre . "', ";
-        $strQuery .= "'" . $primerApellido . "', ";
-        $strQuery .= $segundoApellido == null ? "NULL," : "'" . $segundoApellido . "', " ;
-        $strQuery .= "'" . $direccion  . "', "
-            . "'" . $email . "', "
-            . "'" . $telefono . "', ";
-        $strQuery .= $whatsapp == null ? "NULL," : "'" . $whatsapp . "', ";
-        $strQuery .= $user_id . ", "
-            . "'" . $rangoEdad . "', "
-            . "'" . $longitud . "', "
-            . "'" . $latitud . "' );";
-
-        return response()->json([
-            'data' => DB::select($strQuery),
-        ], 200);
-
+        try {
+            //code...
+            // Captura de request
+            $identificacion = $request->identificacion;
+            $genero = $request->genero;
+            $primerNombre = $request->primerNombre;
+            $segundoNombre = $request->segundoNombre;
+            $primerApellido = $request->primerApellido;
+            $segundoApellido = $request->segundoApellido;
+            $direccion = $request->direccion;
+            $email = $request->email;
+            $telefono = $request->telefono;
+            $whatsapp = $request->whatsapp;
+            $user_id = $request->user_id;
+            $rangoEdad = $request->rangoEdad;
+            $longitud = $request->longitud;
+            $latitud = $request->latitud;
+            $intereces = $request->intereces;
+    
+            // Generar consulta
+            $strQuery = "CALL insertProspecto(" 
+                . "'" . $identificacion . "', " 
+                . "'" . $genero . "', " 
+                . "'" . $primerNombre . "', ";
+            $strQuery .= $segundoNombre == null ? "NULL," : "'" . $segundoNombre . "', ";
+            $strQuery .= "'" . $primerApellido . "', ";
+            $strQuery .= $segundoApellido == null ? "NULL," : "'" . $segundoApellido . "', " ;
+            $strQuery .= "'" . $direccion  . "', "
+                . "'" . $email . "', "
+                . "'" . $telefono . "', ";
+            $strQuery .= $whatsapp == null ? "NULL," : "'" . $whatsapp . "', ";
+            $strQuery .= $user_id . ", "
+                . "'" . $rangoEdad . "', "
+                . "'" . $longitud . "', "
+                . "'" . $latitud . "' );";
+            // Ejecutar consulta 
+            $consulta = DB::select($strQuery);
+            // Retomamos el id para registrar los intereces 
+            $lastInsertID = $consulta[0]->id;
+            // Generar consulta 
+            $strQuery = "insert into intereces_prospecto (prospecto_id, interes_id) values ";
+            $i = 0;
+            $count = count($intereces);
+            foreach ($intereces as $i) {
+                $strQuery .= "(" . $lastInsertID . ", " . $i . ")";
+                if($i <= $count){
+                    $strQuery .= ",";
+                }else{
+                    $strQuery .= ";";
+                }
+                $i++;
+            }
+            // Ejecutar consulta
+            $insertIntereces = DB::select($strQuery);
+            // Response
+            return response()->json([
+                "data" => "El prospecto se registro correctamente"
+            ], 200);
+        } catch (\Exception $e) {
+            // Respuesta Error
+            return response()->json([
+                "data" => "Ocurrio un fallo al registrar el prospecto",
+                "error" => $e
+            ], 500);
+        }
     }
 
     public function getIntereces(Request $request){
