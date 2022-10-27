@@ -60,4 +60,5 @@ class UsuarioController extends Controller
       'data' => Role::all()
     ], 200);
   }
+
 }

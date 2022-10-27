@@ -51,6 +51,10 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/getUsers/{rol_id}', [UsuarioController::class, 'getUsers']);
     Route::get('/getRoles', [UsuarioController::class, 'getRoles']);
     // Route::get('/perfil-usuario', [UsuarioController::class], 'getUser');
+    //Formulario
+    Route::get('/getIntereces/{campeign_id}', [ProspectoController::class, 'getIntereces']); // traer los intereces por campeign 
+    Route::post('/insertProspecto', [ProspectoController::class, 'insertProspecto']); // traer los intereces por campeign 
+
 });
 
 Route::post('/register', [AuthController::class, 'register']);
