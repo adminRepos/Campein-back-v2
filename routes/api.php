@@ -14,6 +14,7 @@ use App\Http\Controllers\PaisController;
 use App\Http\Controllers\PartidoPoliticoController;
 use App\Http\Controllers\PreguntaController;
 use App\Http\Controllers\ProspectoController;
+use App\Http\Controllers\EvidenciasController;
 use App\Http\Controllers\RolController;
 use App\Http\Controllers\SubTerritorioController;
 use App\Http\Controllers\TerritorioController;
@@ -53,7 +54,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     // Route::get('/perfil-usuario', [UsuarioController::class], 'getUser');
     //Formulario
     Route::get('/getIntereces/{campeign_id}', [ProspectoController::class, 'getIntereces']); // traer los intereces por campeign 
-    Route::post('/insertProspecto', [ProspectoController::class, 'insertProspecto']); // traer los intereces por campeign 
+    Route::post('/insertProspecto', [ProspectoController::class, 'insertProspecto']); // Registrar prospecto 
+    Route::post('/insertEvidencia', [EvidenciasController::class, 'insertEvidencia']); // Registrar evidencia de usuario 
 
 });
 

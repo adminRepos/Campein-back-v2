@@ -130,6 +130,7 @@ class ProspectoController extends Controller
             return response()->json([
                 "data" => "El prospecto se registro correctamente"
             ], 200);
+            $mensaje = "Error de usuario";
         } catch (\Exception $e) {
             // Respuesta Error
             return response()->json([
