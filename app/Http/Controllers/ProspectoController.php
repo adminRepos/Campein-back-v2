@@ -90,6 +90,8 @@ class ProspectoController extends Controller
             $longitud = $request->longitud;
             $latitud = $request->latitud;
             $intereces = $request->intereces;
+            $tipoDocumento = $request->tipoDocumento;
+            $localidad = $request->localidad;
     
             // Generar consulta
             $strQuery = "CALL insertProspecto(" 
@@ -106,7 +108,9 @@ class ProspectoController extends Controller
             $strQuery .= $user_id . ", "
                 . "'" . $rangoEdad . "', "
                 . "'" . $longitud . "', "
-                . "'" . $latitud . "' );";
+                . "'" . $latitud . "', "
+                . "'" . $tipoDocumento . "', "
+                . "'" . $localidad . "');";
             // Ejecutar consulta 
             $consulta = DB::select($strQuery);
             // Retomamos el id para registrar los intereces 
@@ -141,9 +145,9 @@ class ProspectoController extends Controller
     }
 
     public function getIntereces(Request $request){
-        $campeign_id = intval($request->campeign_id);
+        $rol_id = intval($request->rol_id);
         return response()->json([
-            'data' => DB::select('CALL get_intereces_por_campeign('.$campeign_id.')'),
+            'data' => DB::select('CALL get_intereces_por_campeign('.$rol_id.')'),
         ], 200);
     }
 }

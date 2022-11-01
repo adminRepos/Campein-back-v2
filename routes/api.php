@@ -53,7 +53,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/getRoles', [UsuarioController::class, 'getRoles']);
     // Route::get('/perfil-usuario', [UsuarioController::class], 'getUser');
     //Formulario
-    Route::get('/getIntereces/{campeign_id}', [ProspectoController::class, 'getIntereces']); // traer los intereces por campeign 
+    Route::get('/getIntereces/{rol_id}', [ProspectoController::class, 'getIntereces']); // traer los intereces por campeign 
     Route::post('/insertProspecto', [ProspectoController::class, 'insertProspecto']); // Registrar prospecto 
     Route::post('/insertEvidencia', [EvidenciasController::class, 'insertEvidencia']); // Registrar evidencia de usuario 
 
