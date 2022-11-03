@@ -26,9 +26,9 @@ class EvidenciasController extends Controller
     if ($files == null || $files == []) {
         $mensaje = $mensaje . "No se ha cargado algun archivo\n";
     }
-    if ($body['url'] == "" || $body['url'] == null) {
-        $mensaje = $mensaje . "El campo url es obligatorio\n";
-    }
+    // if ($body['url'] == "" || $body['url'] == null) {
+    //     $mensaje = $mensaje . "El campo url es obligatorio\n";
+    // }
     if ($body['red_social'] == "" || $body['red_social'] == null) {
         $mensaje = $mensaje . "El campo red_social es obligatorio\n";
     }

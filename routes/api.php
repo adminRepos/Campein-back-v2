@@ -47,15 +47,18 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/getSession', [AuthController::class, 'getSession']);
     
     
-    Route::post('/getPrivilegios', [UsuarioController::class, 'getPrivilegios']);
-    Route::get('/getUser', [UsuarioController::class, 'getUser']);
-    Route::get('/getUsers/{rol_id}', [UsuarioController::class, 'getUsers']);
-    Route::get('/getRoles', [UsuarioController::class, 'getRoles']);
     // Route::get('/perfil-usuario', [UsuarioController::class], 'getUser');
     //Formulario
     Route::get('/getIntereces/{rol_id}', [ProspectoController::class, 'getIntereces']); // traer los intereces por campeign 
     Route::post('/insertProspecto', [ProspectoController::class, 'insertProspecto']); // Registrar prospecto 
     Route::post('/insertEvidencia', [EvidenciasController::class, 'insertEvidencia']); // Registrar evidencia de usuario 
+    // Modulo gestion de usuarios
+    Route::post('/insertUser', [UsuarioController::class, 'insertUser']);
+    Route::post('/getPrivilegios', [UsuarioController::class, 'getPrivilegios']);
+    Route::get('/getUser', [UsuarioController::class, 'getUser']);
+    Route::get('/getUsers/{rol_id}', [UsuarioController::class, 'getUsers']);
+    Route::get('/getRoles', [UsuarioController::class, 'getRoles']);
+    Route::get('/getRolesCampeign/{rol_id}', [UsuarioController::class, 'getRolesCampeign']);
 
 });
 
