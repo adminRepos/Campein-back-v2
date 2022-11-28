@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\DB;
  */
 class EvidenciasController extends Controller
 {
+
+
   public function insertEvidencia(){
     // Capturar request
     $body = $_REQUEST;
@@ -65,10 +67,10 @@ class EvidenciasController extends Controller
         if (count($query) == 0) { //
             $mensaje = "Error de usuario";
             return json_encode(array(
-                "estado" => "200",
+                "estado" => "401",
                 "codigoMensaje" => 0,
                 "mensaje" => $mensaje,
-            ));
+            ), 401);
         }
         // $data = $query->fetch(); //
         // $identificacion = $data['identificacion'];
@@ -95,45 +97,52 @@ class EvidenciasController extends Controller
           // $respuesta = Insertaintenciones::guardarEvidencias($datos);
           $respuesta = DB::insert('insert into evidencias_user (url,red_social,image,id_user) values (?, ?, ?, ?)', [$body['url'], $body['red_social'], $newName, $idUser]);
           if ($respuesta) {
-              $mensaje = 'Su evidencia se a guardado correctamente';
+              $mensaje = 'Evidencia guardada exitosamente';
               return json_encode(array(
-                  "estado" => "200",
+                  "estado" => 200,
                   "codigoMensaje" => 0,
                   "mensaje" => $mensaje,
-              ));
+              ), 201);
           } else {
               $mensaje = 'Ocurrio un fallo guardando su evidencia';
               return json_encode(array(
-                  "estado" => "500",
+                  "estado" => 500,
                   "codigoMensaje" => 0,
                   "mensaje" => $mensaje,
-              ));
+              ), 500);
           }
         } else {
           $mensaje = 'Ocurrio un fallo al subir el archivo';
           return json_encode(array(
-              "estado" => "500",
+              "estado" => 500,
               "codigoMensaje" => 0,
               "mensaje" => $mensaje,
-          ));
+          ), 500);
         }
         // return $mensaje;
       } else {
           $mensaje = "Solo se permite archivos .jpg y .png";
           return json_encode(array(
-              "estado" => "200",
+              "estado" => "400",
               "codigoMensaje" => 0,
               "mensaje" => $mensaje,
-          ));
+          ), 400);
       }
     } else {
       return json_encode(array(
-          "estado" => "200",
+          "estado" => "500",
           "codigoMensaje" => 0,
           "mensaje" => $mensaje,
       ));
     }
   }
+
+  public function getEvidenciaTable(Request $request){
+    $id_user = $request->get('id_user');
+
+  }
+
+
 
 
 }

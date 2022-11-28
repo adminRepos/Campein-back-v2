@@ -23,6 +23,7 @@ use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\ZonasUsersController;
 use App\Http\Controllers\ZonaController;
 use App\Http\Controllers\ZoneController;
+use App\Http\Controllers\NotificacionesController;
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::resource('/campeign', CampeignController::class);
@@ -57,8 +58,12 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/getPrivilegios', [UsuarioController::class, 'getPrivilegios']);
     Route::get('/getUser', [UsuarioController::class, 'getUser']);
     Route::get('/getUsers/{rol_id}', [UsuarioController::class, 'getUsers']);
+    Route::get('/getMyUsers/{rol_id}/{myId}', [UsuarioController::class, 'getMyUsers']);
     Route::get('/getRoles', [UsuarioController::class, 'getRoles']);
     Route::get('/getRolesCampeign/{rol_id}', [UsuarioController::class, 'getRolesCampeign']);
+    Route::get('/getEvidenciaTable/{id_user}', [EvidenciasController::class, 'getEvidenciaTable']);
+    // NOTIFICACIONES
+    Route::post('/insertNotificaciones', [NotificacionesController::class, 'insertNotificaciones']);
 
 });
 
