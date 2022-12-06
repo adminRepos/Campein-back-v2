@@ -56,11 +56,12 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     // Modulo gestion de usuarios
     Route::post('/insertUser', [UsuarioController::class, 'insertUser']);
     Route::post('/getPrivilegios', [UsuarioController::class, 'getPrivilegios']);
-    Route::get('/getUser', [UsuarioController::class, 'getUser']);
+    Route::get('/getUser/{id}', [UsuarioController::class, 'getUser']);
     Route::get('/getUsers/{rol_id}', [UsuarioController::class, 'getUsers']);
     Route::get('/getMyUsers/{rol_id}/{myId}', [UsuarioController::class, 'getMyUsers']);
     Route::get('/getRoles', [UsuarioController::class, 'getRoles']);
     Route::get('/getRolesCampeign/{rol_id}', [UsuarioController::class, 'getRolesCampeign']);
+    // EVIDENCIAS
     Route::get('/getEvidenciaTable/{id_user}', [EvidenciasController::class, 'getEvidenciaTable']);
     // NOTIFICACIONES
     Route::post('/insertNotificaciones', [NotificacionesController::class, 'insertNotificaciones']);

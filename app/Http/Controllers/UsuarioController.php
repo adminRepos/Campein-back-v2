@@ -130,7 +130,8 @@ class UsuarioController extends Controller
   }
 
   public function getUser(Request $request){
-    $id = $request->post('id');
+    // $id = $request->post('id');
+    $id = intval($request->id);
     return response()->json([
       'data' => DB::select('CALL sp_get_user('.$id.')'),
     ], 200);
