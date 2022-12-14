@@ -24,6 +24,7 @@ use App\Http\Controllers\ZonasUsersController;
 use App\Http\Controllers\ZonaController;
 use App\Http\Controllers\ZoneController;
 use App\Http\Controllers\NotificacionesController;
+use App\Http\Controllers\NoticiasController;
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::resource('/campeign', CampeignController::class);
@@ -55,7 +56,10 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/insertEvidencia', [EvidenciasController::class, 'insertEvidencia']); // Registrar evidencia de usuario 
     // Modulo gestion de usuarios
     Route::post('/insertUser', [UsuarioController::class, 'insertUser']);
+    Route::post('/updateUser', [UsuarioController::class, 'updateUser']);
+    Route::get('/activarUser/{id}', [UsuarioController::class, 'activarUser']);
     Route::post('/getPrivilegios', [UsuarioController::class, 'getPrivilegios']);
+    Route::get('/getUsersTable/{rol_id}/{id}', [UsuarioController::class, 'getUsersTable']);
     Route::get('/getUser/{id}', [UsuarioController::class, 'getUser']);
     Route::get('/getUsers/{rol_id}', [UsuarioController::class, 'getUsers']);
     Route::get('/getMyUsers/{rol_id}/{myId}', [UsuarioController::class, 'getMyUsers']);
@@ -65,6 +69,16 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/getEvidenciaTable/{id_user}', [EvidenciasController::class, 'getEvidenciaTable']);
     // NOTIFICACIONES
     Route::post('/insertNotificaciones', [NotificacionesController::class, 'insertNotificaciones']);
+    // NOTICIAS
+    Route::post('/insertNoticia', [NoticiasController::class, 'insertNoticia']);
+    Route::get('/selectNoticiasxCampeign/{id_user}', [NoticiasController::class, 'selectNoticias']);
+
+
+    // Peticiones mobile
+    Route::get('/getUsersAlfa/{id_user}', [UsuarioController::class, 'getUsersAlfa']);
+    Route::get('/getUsersBeta/{id_user}', [UsuarioController::class, 'getUsersBeta']);
+
+
 
 });
 
