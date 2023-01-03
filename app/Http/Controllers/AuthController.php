@@ -48,24 +48,42 @@ class AuthController extends Controller
 
   public function login(Request $request)
   {
-    $requestEmail = $request->get('email');
-    $requestPassword = $request->get('password');
-
-    if (!Auth::attempt(['email' => $requestEmail, 'password' => $requestPassword])) {
+    try {
+      //code...
+      $requestEmail = $request->get('email');
+      $requestPassword = $request->get('password');
+  
+      if (!Auth::attempt(['email' => $requestEmail, 'password' => $requestPassword])) {
+        return response()->json([
+          // 'message' => 'Credeciales de acceso errones',
+          'message' => 'Usuario y/o contraseña incorrectos',
+          'error' => 'Unauthorized access'
+        ], 401);
+      }
+  
+      $userData = User::where('email', '=', $requestEmail)->firstOrFail();
+      if($userData->activo == 1){
+        $authToken = $userData->createToken('auth_token')->plainTextToken;
+        return response()->json([
+          'access_token' => $authToken,
+          'token_type' => 'Bearer',
+          'user' => auth()->user()
+        ], 200);
+      }else{
+        return response()->json([
+          'code' => 403,
+          'message' => 'Usuario bloqueado temporalmente, Por favor
+          comuníquese con su líder',
+        ], 403);
+      }
+    } catch (\Throwable $th) {
       return response()->json([
-        // 'message' => 'Credeciales de acceso errones',
-        'message' => 'Usuario y/o contraseña incorrectos',
-        'error' => 'Unauthorized access'
-      ], 401);
+        'code' => 500,
+        'message' => 'Error interno del servidor',
+        'error' => $th
+      ], 500);
+      //throw $th;
     }
-
-    $userData = User::where('email', '=', $requestEmail)->firstOrFail();
-    $authToken = $userData->createToken('auth_token')->plainTextToken;
-    return response()->json([
-      'access_token' => $authToken,
-      'token_type' => 'Bearer',
-      'user' => auth()->user()
-    ], 200);
   }
 
   public function getSession(Request $request){

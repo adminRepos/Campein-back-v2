@@ -11,12 +11,21 @@ class Campeign extends Model
 
     protected $table = "campeigns";
 
-    // protected $fillable = [
-    //     'nombre',
-    //     'email',
-    //     'pais_id',
-    //     'partido_id'
-    // ];
+    protected $fillable = [
+        'id', 
+        'nombre', 
+        'lema', 
+        'url', 
+        'mision', 
+        'vision', 
+        'email', 
+        'activo', 
+        'pais_id', 
+        'created_at', 
+        'updated_at', 
+        'pass_email', 
+        'meta'
+    ];
 
     public function country()
     {

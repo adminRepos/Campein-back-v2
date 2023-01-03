@@ -244,14 +244,49 @@ class UsuarioController extends Controller
   }
 
   public function activarUser(Request $request){
-    $id = intval($request->id);
-    $user = User::find($id);
-    if($user->activo == 1) $user->activo = 0;
-    else if($user->activo == 0) $user->activo = 1;
-    $user->save();
-    return response()->json([
-      'data' => $user,
-    ], 200);
+    try {
+      //code...
+      $id = intval($request->id);
+      $user = User::find($id);
+      if($user->activo == 1) $user->activo = 0;
+      else if($user->activo == 0) $user->activo = 1;
+      $user->save();
+      DB::select('CALL update_user_activo('.$id.')');
+      return response()->json([
+        'code' => 200,
+        'message' => "Se modifico el estado del usuario y sus registros de prospectos y evidencias.",
+      ], 200);
+      
+    } catch (\Throwable $th) {
+      return response()->json([
+        'code' => 500, // Internal server error
+        'message' => "Error interno del servidor",
+        'error' => $th
+      ], 500);
+    }
+  }
+
+  public function activarUserData(Request $request){
+    try {
+      //code...
+      $id = intval($request->id);
+      $user = User::find($id);
+      if($user->activo == 1) $user->activo = 0;
+      else if($user->activo == 0) $user->activo = 1;
+      $user->save();
+      DB::select('CALL update_user_activo('.$id.')');
+      DB::select('CALL update_user_activo_users('.$id.')');
+      return response()->json([
+        'code' => 200,
+        'message' => "Se modifico el estado del usuario y sus registros de usuarios, prospectos y evidencias.",
+      ], 200);
+    } catch (\Throwable $th) {
+      return response()->json([
+        'code' => 500, // Internal server error
+        'message' => "Error interno del servidor",
+        'error' => $th
+      ], 500);
+    }
   }
 
   public function getUser(Request $request){
@@ -402,8 +437,27 @@ class UsuarioController extends Controller
   public function getUsersAlfa(Request $request, $id_user){
     $user = User::find($id_user);
     if($user->rol_id == 2){
+      $data = DB::select('CALL select_alfas_admin()');
+      foreach ($data as $e) {
+        $nameImage = $e->image;
+        if($nameImage <> null){
+          // $e->image = "test";
+          $dir = '../resources/images/profile-img/'.$e->image;
+          if (file_exists($dir) == false) {
+            $e->image = null;
+          }else{
+            // Extensión de la imagen
+            $type = pathinfo($dir, PATHINFO_EXTENSION);
+            // Cargando la imagen
+            $img = file_get_contents($dir);
+            // Decodificando la imagen en base64
+            $base64 = 'data:image/' . $type . ';base64,' . base64_encode($img);
+            $e->image = $base64;          
+          }
+        }
+      }
       return response()->json([
-        'data' => DB::select('CALL select_alfas_admin()'),
+        'data' => $data,
       ], 200);
     }else{
       return response()->json([
@@ -415,12 +469,50 @@ class UsuarioController extends Controller
   public function getUsersBeta(Request $request, $id_user){
     $user = User::find($id_user);
     if($user->rol_id == 2){
+      $data = DB::select('CALL select_betas_admin()');
+      foreach ($data as $e) {
+        $nameImage = $e->image;
+        if($nameImage <> null){
+          // $e->image = "test";
+          $dir = '../resources/images/profile-img/'.$e->image;
+          if (file_exists($dir) == false) {
+            $e->image = null;
+          }else{
+            // Extensión de la imagen
+            $type = pathinfo($dir, PATHINFO_EXTENSION);
+            // Cargando la imagen
+            $img = file_get_contents($dir);
+            // Decodificando la imagen en base64
+            $base64 = 'data:image/' . $type . ';base64,' . base64_encode($img);
+            $e->image = $base64;          
+          }
+        }
+      }
       return response()->json([
-        'data' => DB::select('CALL select_betas_admin()'),
+        'data' => $data,
       ], 200);
     }else{
+      $data = DB::select('CALL sp_get_my_users('.$id_user.')');
+      foreach ($data as $e) {
+        $nameImage = $e->image;
+        if($nameImage <> null){
+          // $e->image = "test";
+          $dir = '../resources/images/profile-img/'.$e->image;
+          if (file_exists($dir) == false) {
+            $e->image = null;
+          }else{
+            // Extensión de la imagen
+            $type = pathinfo($dir, PATHINFO_EXTENSION);
+            // Cargando la imagen
+            $img = file_get_contents($dir);
+            // Decodificando la imagen en base64
+            $base64 = 'data:image/' . $type . ';base64,' . base64_encode($img);
+            $e->image = $base64;          
+          }
+        }
+      }
       return response()->json([
-        'data' => DB::select('CALL sp_get_my_users('.$id_user.')'),
+        'data' => $data,
       ], 200);
     }
   }

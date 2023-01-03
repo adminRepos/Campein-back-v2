@@ -51,9 +51,9 @@ class NoticiasController extends Controller
 
             $numero = DB::select('SELECT COUNT(*) as conteo FROM noticias;');
             $se_movio = false;
-            $nombre_archivo = $files['image']['name'];
-            $tipo_archivo = $files['image']['type'];
-            $tamano_archivo = $files['image']['size'];
+            $nombre_archivo = $files['imagen']['name'];
+            $tipo_archivo = $files['imagen']['type'];
+            $tamano_archivo = $files['imagen']['size'];
             $j = array_search($tipo_archivo, array(
                 'jpg' => 'image/jpeg',
                 'png' => 'image/png',
@@ -70,7 +70,7 @@ class NoticiasController extends Controller
                         $bool = false;
                     }
                 }
-                if (move_uploaded_file($files['image']['tmp_name'], $dest_path)) {
+                if (move_uploaded_file($files['imagen']['tmp_name'], $dest_path)) {
                     $se_movio = true;
                 }else{
                     $se_movio = false;
@@ -106,9 +106,7 @@ class NoticiasController extends Controller
                     'message' => "Error al subir el archivo al servidor",
                     'error' => "Carga de archivo"
                 ], 500);
-            } 
-    
-
+            }
         } catch (\Throwable $th) {
             return response()->json([
                 'code' => 500, // Internal server error
@@ -123,8 +121,26 @@ class NoticiasController extends Controller
     public function selectNoticias(Request $request)
     {
         $id = intval($request->id_user);
+        $data = DB::select('CALL get_noticias_x_campeign(?)', [$id]);
+        foreach ($data as $e) {
+            $nameImage = $e->imagen;
+            if($nameImage <> null){
+              $dir = '../resources/images/noticias/'.$e->imagen;
+              if (file_exists($dir) == false) {
+                $e->imagen = null;
+              }else{
+                // Extensión de la imagen
+                $type = pathinfo($dir, PATHINFO_EXTENSION);
+                // Cargando la imagen
+                $img = file_get_contents($dir);
+                // Decodificando la imagen en base64
+                $base64 = 'data:image/' . $type . ';base64,' . base64_encode($img);
+                $e->imagen = $base64;          
+              }
+            }
+          }
         return response()->json([
-            'data' => DB::select('CALL get_noticias_x_campeign(?)', [$id]),
+            'data' => $data,
           ], 200);
     }
 }

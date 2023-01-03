@@ -58,6 +58,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/insertUser', [UsuarioController::class, 'insertUser']);
     Route::post('/updateUser', [UsuarioController::class, 'updateUser']);
     Route::get('/activarUser/{id}', [UsuarioController::class, 'activarUser']);
+    Route::get('/activarUserData/{id}', [UsuarioController::class, 'activarUserData']);
     Route::post('/getPrivilegios', [UsuarioController::class, 'getPrivilegios']);
     Route::get('/getUsersTable/{rol_id}/{id}', [UsuarioController::class, 'getUsersTable']);
     Route::get('/getUser/{id}', [UsuarioController::class, 'getUser']);
@@ -65,6 +66,9 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/getMyUsers/{rol_id}/{myId}', [UsuarioController::class, 'getMyUsers']);
     Route::get('/getRoles', [UsuarioController::class, 'getRoles']);
     Route::get('/getRolesCampeign/{rol_id}', [UsuarioController::class, 'getRolesCampeign']);
+    // reporte Excel
+    Route::get('/getDataExcel/{id_user}/{datos}', [CampeignController::class, 'getDataExcel']);
+    Route::get('/getDataExcelAdminMobile/{rol_id}', [CampeignController::class, 'getDataExcelAdminMobile']);
     // EVIDENCIAS
     Route::get('/getEvidenciaTable/{id_user}', [EvidenciasController::class, 'getEvidenciaTable']);
     // NOTIFICACIONES
@@ -78,9 +82,12 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/getUsersAlfa/{id_user}', [UsuarioController::class, 'getUsersAlfa']);
     Route::get('/getUsersBeta/{id_user}', [UsuarioController::class, 'getUsersBeta']);
 
-
-
+    // reporte pdf mobile
+    Route::get('/getPDF/{id_user}/{datos}', [CampeignController::class, 'getPDF']);
+    Route::get('/getPDFAdminMobile/{rol_id}', [CampeignController::class, 'getPDFAdminMobile']);
+    
 });
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+
