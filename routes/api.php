@@ -25,6 +25,7 @@ use App\Http\Controllers\ZonaController;
 use App\Http\Controllers\ZoneController;
 use App\Http\Controllers\NotificacionesController;
 use App\Http\Controllers\NoticiasController;
+use App\Http\Controllers\EstadisticasController;
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::resource('/campeign', CampeignController::class);
@@ -64,8 +65,12 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/getUser/{id}', [UsuarioController::class, 'getUser']);
     Route::get('/getUsers/{rol_id}', [UsuarioController::class, 'getUsers']);
     Route::get('/getMyUsers/{rol_id}/{myId}', [UsuarioController::class, 'getMyUsers']);
+    Route::get('/getMyUsersActivos/{rol_id}/{myId}', [UsuarioController::class, 'getMyUsersActivos']);
     Route::get('/getRoles', [UsuarioController::class, 'getRoles']);
     Route::get('/getRolesCampeign/{rol_id}', [UsuarioController::class, 'getRolesCampeign']);
+    
+    Route::get('/getUserGestion/{id_user}', [UsuarioController::class, 'getUserGestion']);
+    Route::get('/cambioMeta/{numero}', [CampeignController::class, 'cambioMeta']);
     // reporte Excel
     Route::get('/getDataExcel/{id_user}/{datos}', [CampeignController::class, 'getDataExcel']);
     Route::get('/getDataExcelAdminMobile/{rol_id}', [CampeignController::class, 'getDataExcelAdminMobile']);
@@ -77,14 +82,29 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/insertNoticia', [NoticiasController::class, 'insertNoticia']);
     Route::get('/selectNoticiasxCampeign/{id_user}', [NoticiasController::class, 'selectNoticias']);
 
-
     // Peticiones mobile
     Route::get('/getUsersAlfa/{id_user}', [UsuarioController::class, 'getUsersAlfa']);
+    Route::get('/getUsersAlfaData/{id_user}', [UsuarioController::class, 'getUsersAlfaData']);
     Route::get('/getUsersBeta/{id_user}', [UsuarioController::class, 'getUsersBeta']);
 
     // reporte pdf mobile
     Route::get('/getPDF/{id_user}/{datos}', [CampeignController::class, 'getPDF']);
     Route::get('/getPDFAdminMobile/{rol_id}', [CampeignController::class, 'getPDFAdminMobile']);
+
+    Route::get('/getEvidenciasUsuario/{id_user}', [EvidenciasController::class, 'getEvidenciasUsuario']);
+    Route::get('/getReporteEvidenciasUsuario/{id_user}', [EvidenciasController::class, 'getReporteEvidenciasUsuario']);
+    Route::get('/getReporteEvidencias/{id_user}', [EvidenciasController::class, 'getReporteEvidencias']);
+    
+    // Estadisticas
+    Route::get('/getEstadisticasTotalUsuarios/{id_user}', [EstadisticasController::class, 'getEstadisticasTotalUsuarios']);
+    Route::get('/getPorcentajesProspectosXRol/{id_user}', [EstadisticasController::class, 'getPorcentajesProspectosXRol']);
+    Route::get('/getEstadisticaLocalidades/{id_user}', [EstadisticasController::class, 'getEstadisticaLocalidades']);
+    Route::get('/getLideresBetaRanking/{id_user}', [EstadisticasController::class, 'getLideresBetaRanking']);
+
+    Route::get('/getEstadisticasUsuario/{id_user}', [EstadisticasController::class, 'getEstadisticasUsuario']);
+
+
+
     
 });
 

@@ -206,4 +206,20 @@ class CampeignController extends Controller
             //throw $th;
         }
     }
+
+    public function cambioMeta(Request $request, $numero){
+        try {
+            $query = DB::select("UPDATE campeigns SET meta = ? WHERE id = 2;", [intval($numero)]);
+            return response()->json([
+                'code' => 200, // succes
+                'data' => 'full',
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'code' => 500, // warning
+                'message' => "Error interno del servidor",
+                'error' => $th 
+            ], 500);
+        }
+    }
 }

@@ -23,6 +23,7 @@ class UsuarioController extends Controller
       $validacionEmail = User::where('email', '=', $body['email'])->first();
       $validacionIdentificacion = User::where('identificacion', '=', $body['identificacion'])->first();
       if($validacionEmail == null && $validacionIdentificacion == null){
+        // if(intval($body['rol_id']) == 4) $userSession = User::find(intval($body['id_user_session']));
         if ($files == null || $files == []) {
           $dest_path = null;
           $newUser = User::create([
@@ -41,6 +42,8 @@ class UsuarioController extends Controller
             'fecha_nacimiento' => $body['fecha_nacimiento'],
             'image' => $dest_path
           ]);
+          // $insert = User::where('email', '=', $body['email']);
+          if(intval($body['rol_id']) == 4) $query = DB::select("INSERT INTO users_users (mayor, menor) VALUES (?, ?);", [intval($body['id_user_session']), intval($newUser->id)]);
           return response()->json([
             'code' => 201, // success
             'data' => $newUser,
@@ -85,6 +88,8 @@ class UsuarioController extends Controller
                 'fecha_nacimiento' => $body['fecha_nacimiento'],
                 'image' => $newName
               ]);
+              // $insert = User::where('email', '=', $body['email']);
+              if(intval($body['rol_id']) == 4) $query = DB::select("INSERT INTO users_users (mayor, menor) VALUES (?, ?);", [intval($body['id_user_session']), intval($newUser->id)]);
               return response()->json([
                 'code' => 201, // success
                 'data' => $newUser,
@@ -94,11 +99,11 @@ class UsuarioController extends Controller
                 'code' => 500, // danger
                 'message' => 'Ocurrio un fallo al subir el archivo',
                 'error' => 'Carga archivo'
-              ], 500);
+              ], 200);
             }
           }else{
             return response()->json([
-              'code' => 404, // warning
+              'code' => 400, // warning
               'message' => 'Solo se permite archivos .jpg y .png',
               'error' => 'Error formato'
             ], 200);
@@ -107,15 +112,15 @@ class UsuarioController extends Controller
       }else{
         if($validacionEmail <> null){
           return response()->json([
-            'code' => 404, // warning
+            'code' => 400, // warning
             'message' => 'El email ingresado ya existe en el sistema',
             'error' => 'Email existente'
           ], 200);
         }
         if($validacionIdentificacion <> null){
           return response()->json([
-            'code' => 404, // warning
-            'message' => 'El usuario está registrado en la base de datos',
+            'code' => 400, // warning
+            'message' => 'la identificacion ya existe en la base de datos',
             'error' => 'Identificacion existente'
           ], 200);
         }
@@ -340,6 +345,9 @@ class UsuarioController extends Controller
 
   private function validarCamposUser($body, $peticion){
     
+    if($body["id_user_session"] == "" || $body["id_user_session"] == null){ // || !is_int($body["rol_id"])
+      return "Debe enviar el id del usuario en sesion";
+    }
     if($body["rol_id"] == "" || $body["rol_id"] == null){ // || !is_int($body["rol_id"])
       return "Debe seleccionar el rol";
     }
@@ -401,6 +409,43 @@ class UsuarioController extends Controller
 
   }
 
+  public function getMyUsersActivos(Request $request, $rol_id, $myId){
+    $data = [];
+    if($rol_id == 1){
+
+    } else if($rol_id == 2){
+      $data = DB::select('CALL sp_get_users_campeing('.$rol_id.')');
+    } else{
+      $data = DB::select('CALL sp_get_my_users('.$myId.')');
+    }
+    $newData = [];
+    foreach($data as $e){
+      if($e->activo == 1) array_push($newData, $e);
+    }
+    // var_dump($data);
+    foreach ($newData as $e) { 
+      $nameImage = $e->image;
+      if($nameImage <> null){
+        // $e->image = "test";
+        $dir = '../resources/images/profile-img/'.$e->image;
+        if (file_exists($dir) == false) {
+          $e->image = null;
+        }else{
+          // Extensión de la imagen
+          $type = pathinfo($dir, PATHINFO_EXTENSION);
+          // Cargando la imagen
+          $img = file_get_contents($dir);
+          // Decodificando la imagen en base64
+          $base64 = 'data:image/' . $type . ';base64,' . base64_encode($img);
+          $e->image = $base64;          
+        }
+      }
+    }
+    return response()->json([
+      'data' => $newData,
+    ], 200);
+  }
+
   public function getMyUsers(Request $request, $rol_id, $myId){
     $data = [];
     if($rol_id == 1){
@@ -429,8 +474,11 @@ class UsuarioController extends Controller
         }
       }
     }
+    $queryMeta = DB::select("SELECT meta from campeigns where id = 2;");
     return response()->json([
+      'code' => 200,
       'data' => $data,
+      'meta' => $queryMeta[0]->meta
     ], 200);
   }
 
@@ -456,6 +504,20 @@ class UsuarioController extends Controller
           }
         }
       }
+      return response()->json([
+        'data' => $data,
+      ], 200);
+    }else{
+      return response()->json([
+        'data' => "Un lider alfa no puede ver los demas lideres alfa",
+      ], 200);
+    }
+  }
+  
+  public function getUsersAlfaData(Request $request, $id_user){
+    $user = User::find($id_user);
+    if($user->rol_id == 2){
+      $data = DB::select("SELECT concat(nombre, ' ', apellido) as nombre, id FROM users where (rol_id = 3)");
       return response()->json([
         'data' => $data,
       ], 200);
@@ -517,10 +579,58 @@ class UsuarioController extends Controller
     }
   }
 
-  // public function getImageUser(Request $request, $id_user){
-  //   $user = User::find($id_user);
-  //   $nameImage = $user->image;
-  //   if($nameImage == null ){}
-  // }
+
+  public function getUserGestion(Request $request, $id_user){
+    try {
+      $dataUser = DB::select("SELECT 
+          u.id,
+          u.activo,
+              concat(u.nombre, ' ', u.apellido) as nombre_user,
+          u.email,
+              r.nombre_publico as rol,
+              (select count(b.id) from prospectos as b where b.user_id = u.id) as numero_formularios,
+              u.image
+        from users as u
+          inner join roles as r on r.id = u.rol_id
+        where u.id = ?", [intval($id_user)]
+      );
+      $prospectos = DB::select("SELECT concat(p.primer_nombre, ' ', p.primer_apellido) as nombre, p.tipo_documento, p.identificacion, p.email, p.telefono, p.localidad from prospectos as p where p.user_id = ?;", [intval($id_user)]
+      );
+
+      foreach ($dataUser as $e) {
+        $nameImage = $e->image;
+        if($nameImage <> null){
+          // $e->image = "test";
+          $dir = '../resources/images/profile-img/'.$e->image;
+          if (file_exists($dir) == false) {
+            $e->image = null;
+          }else{
+            // Extensión de la imagen
+            $type = pathinfo($dir, PATHINFO_EXTENSION);
+            // Cargando la imagen
+            $img = file_get_contents($dir);
+            // Decodificando la imagen en base64
+            $base64 = 'data:image/' . $type . ';base64,' . base64_encode($img);
+            $e->image = $base64;          
+          }
+        }
+      }
+      $queryMeta = DB::select("SELECT meta from campeigns where id = 2;");
+      return response()->json([
+        'code' => 200,
+        'meta' => $queryMeta[0]->meta,
+        'dataUser' => $dataUser,
+        'prospectos' => $prospectos,
+      ], 200);
+    } catch (\Throwable $th) {
+      return response()->json([
+        'code' => 500, // warning
+        'message' => "Error interno del servidor",
+        'error' => $th 
+      ], 500);
+    }
+
+
+  }
 
 }

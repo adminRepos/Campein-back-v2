@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
+use App\Models\User;
+use PDF;
 
 /**
  * Controlador de las evidencias
@@ -140,6 +142,135 @@ class EvidenciasController extends Controller
   public function getEvidenciaTable(Request $request){
     $id_user = $request->get('id_user');
 
+  }
+
+  public function getEvidenciasUsuario(Request $request, $id_user)
+  {
+    try {
+
+      $data = DB::select("SELECT eu.id, eu.red_social, eu.url, eu.image, eu.created_at, eu.activo FROM evidencias_user AS eu WHERE eu.id_user = ?;", [intval($id_user)]);
+
+      foreach ($data as $e) {
+        $nameImage = $e->image;
+        if($nameImage <> null){
+          // $e->image = "test";
+          $dir = '../resources/images/evidencias/'.$e->image;
+          if (file_exists($dir) == false) {
+            $e->image = null;
+          }else{
+            // Extensión de la imagen
+            $type = pathinfo($dir, PATHINFO_EXTENSION);
+            // Cargando la imagen
+            $img = file_get_contents($dir);
+            // Decodificando la imagen en base64
+            $base64 = 'data:image/' . $type . ';base64,' . base64_encode($img);
+            $e->image = $base64;          
+          }
+        }
+      }
+      return json_encode(array(
+        "code" => "200",
+        "data" => $data
+      ), 200);
+    } catch (\Throwable $th) {
+      return json_encode(array(
+        "code" => "500",
+        "message" => "Error interno del servidor",
+        "error" => $th
+      ), 200);
+    }
+  }
+
+
+  public function getReporteEvidenciasUsuario(Request $request, $id_user){
+    try {
+      $data = null;
+
+      $datosUser = DB::select("SELECT concat(u.nombre, ' ', u.apellido) as nombre, r.nombre_publico as rol from users as u inner join roles as r on r.id = u.rol_id where u.id = ? limit 1;", [intval($id_user)]);
+
+      $data = DB::select("SELECT eu.id, eu.red_social, eu.url, eu.created_at, eu.activo FROM evidencias_user AS eu WHERE eu.id_user = ?;", [intval($id_user)]);
+
+      $user = array((object)[
+        'nombre' => $datosUser[0]->nombre,
+        'rol' => $datosUser[0]->rol,
+        'evidencias' => count($data)
+      ]);
+
+      $pdf = PDF::loadView('reporte-evidencias-usuario-mobile-pdf', ['user'=>$user, 'data' => $data, 'i'=>0]);
+
+      // return $pdf->stream();
+      return response()->json([
+          'code' => 200, // succes
+          'data' => base64_encode($pdf->stream()),
+      ], 200);
+
+    } catch (\Throwable $th) {
+        return response()->json([
+            'code' => 500, // warning
+            'message' => "Error interno del servidor",
+            'error' => $th 
+        ], 500);
+        //throw $th;
+    }
+  }
+
+  public function getReporteEvidencias(Request $request, $id_user){
+    try {
+      $data = null;
+
+      $datosUser = DB::select("SELECT concat(u.nombre, ' ', u.apellido) as nombre, r.nombre_publico as rol, r.jerarquia, r.campeigns_id from users as u inner join roles as r on r.id = u.rol_id where u.id = ? limit 1;", [intval($id_user)]);
+
+      if($datosUser[0]->jerarquia == 1){
+        $data = DB::select("SELECT 
+                          eu.id, 
+                          eu.red_social, 
+                          eu.url, 
+                          eu.created_at, 
+                          eu.activo,
+                          CONCAT(u.nombre, ' ', u.apellido) as nombre,
+                          r.nombre_publico as rol
+                          FROM evidencias_user AS eu 
+                              inner join users as u on u.id = eu.id_user
+                              inner join roles as r on r.id = u.rol_id
+                              inner join campeigns as c on c.id = r.campeigns_id
+                          where c.id = ?;", 
+        [$datosUser[0]->campeigns_id]);
+      } else $data = DB::select("SELECT 
+        eu.id, 
+        eu.red_social, 
+        eu.url, 
+        eu.created_at, 
+        eu.activo,
+        CONCAT(u.nombre, ' ', u.apellido) as nombre,
+        r.nombre_publico as rol
+        FROM evidencias_user AS eu 
+            inner join users_users as d on d.menor = eu.id_user
+            inner join users as u on u.id = eu.id_user
+            inner join roles as r on r.id = u.rol_id
+        WHERE d.mayor = ?;", [intval($id_user)]); 
+      
+
+      $user = array((object)[
+        'nombre' => $datosUser[0]->nombre,
+        'rol' => $datosUser[0]->rol,
+        'evidencias' => count($data)
+      ]);
+
+      $pdf = PDF::loadView('reporte-evidencias-total-mobile-pdf', ['user'=>$user, 'data' => $data, 'i'=>0]);
+
+      return response()->json([
+          'code' => 200, // succes
+          'data' => base64_encode($pdf->stream()),
+      ], 200);
+
+    } catch (\Throwable $th) {
+        return response()->json([
+            'code' => 500, // warning
+            'message' => "Error interno del servidor",
+            'error' => $th 
+        ], 500);
+        //throw $th;
+    }
   }
 
 
