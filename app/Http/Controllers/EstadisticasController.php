@@ -243,9 +243,231 @@ class EstadisticasController extends Controller{
         }
     }
 
+    // Estadisticas de usuarios en ranking
+    public function getEstadisticasHome(Request $request){
+        $date = date("Y-m-d H:i:s", time());
+        $mes = date("m",strtotime($date));
+        $ano = date("Y",strtotime($date));
+
+        $dataAlfas = DB::select("CALL get_estadistica_ranking_prospectos_x_rol_admin(?)", [3]);
+        $dataBetas = DB::select("CALL get_estadistica_ranking_prospectos_x_rol_admin(?)", [4]);
+
+        $stringDate = $ano . '-' . $mes . '-01 00:00:00';
+        $dataMes = DB::select("CALL get_estadistica_lider_destacado_mes(?)", [$stringDate]);
+
+        $objetoRanking = null;
+
+        foreach($dataMes as $item){
+            if($objetoRanking == null) $objetoRanking = $item;
+            if($objetoRanking->conteo < $item->conteo) $objetoRanking = $item;
+        }
+
+        if($objetoRanking <> null){
+            $nameImage = $objetoRanking->image;
+            if($nameImage <> null){
+                // $e->image = "test";
+                $dir = '../resources/images/profile-img/'.$objetoRanking->image;
+                if (file_exists($dir) == false) {
+                    $objetoRanking->image = null;
+                }else{
+                    // Extensión de la imagen
+                    $type = pathinfo($dir, PATHINFO_EXTENSION);
+                    // Cargando la imagen
+                    $img = file_get_contents($dir);
+                    // Decodificando la imagen en base64
+                    $base64 = 'data:image/' . $type . ';base64,' . base64_encode($img);
+                    $objetoRanking->image = $base64;          
+                }
+            }
+        }
+
+        $longitud = count($dataAlfas);
+        for ($i = 0; $i < $longitud; $i++) {
+            for ($j = 0; $j < $longitud - 1; $j++) {
+                if ($dataAlfas[$j]->conteo < $dataAlfas[$j + 1]->conteo) {
+                    $temporal = $dataAlfas[$j];
+                    $dataAlfas[$j] = $dataAlfas[$j + 1];
+                    $dataAlfas[$j + 1] = $temporal;
+                }
+            }
+        }
+
+        $longitud = count($dataBetas);
+        for ($i = 0; $i < $longitud; $i++) {
+            for ($j = 0; $j < $longitud - 1; $j++) {
+                if ($dataBetas[$j]->conteo < $dataBetas[$j + 1]->conteo) {
+                    $temporal = $dataBetas[$j];
+                    $dataBetas[$j] = $dataBetas[$j + 1];
+                    $dataBetas[$j + 1] = $temporal;
+                }
+            }
+        }
+
+        $dataAlfaExport = array();
+        $testeo = 0;
+        foreach($dataAlfas as $item){
+            if($item->conteo > 0 && $item->id <> $objetoRanking->user_id){
+                $conteo = 0;
+                foreach($dataAlfas as $itemCont){
+                    if($item->conteo == $itemCont->conteo && $item <> $itemCont) $conteo++;
+                }
+                if(count($dataAlfaExport) == 0){
+                    array_push($dataAlfaExport, (object)[
+                        'id'=>$item->id,
+                        'nombre'=>$item->nombre,
+                        'image'=>$item->image,
+                        'formularios'=>$item->conteo,
+                        'coincidencias'=>$conteo
+                    ]);
+                }elseif($dataAlfaExport[$testeo]->formularios !== $item->conteo){
+                    array_push($dataAlfaExport, (object)[
+                        'id'=>$item->id,
+                        'nombre'=>$item->nombre,
+                        'image'=>$item->image,
+                        'formularios'=>$item->conteo,
+                        'coincidencias'=>$conteo
+                    ]);
+                    $testeo++;
+                }
+
+            }
+        }
+
+        $dataBetaExport = array();
+        $testeo = 0;
+        foreach($dataBetas as $item){
+            if($item->conteo > 0 && $item->id <> $objetoRanking->user_id){
+                $conteo = 0;
+                foreach($dataBetas as $itemCont){
+                    if($item->conteo == $itemCont->conteo) $conteo++;
+                }
+                if(count($dataBetaExport) == 0){
+                    array_push($dataBetaExport, (object)[
+                        'id'=>$item->id,
+                        'nombre'=>$item->nombre,
+                        'image'=>$item->image,
+                        'formularios'=>$item->conteo,
+                        'coincidencias'=>$conteo
+                    ]);
+                }elseif($dataBetaExport[$testeo]->formularios !== $item->conteo){
+                    array_push($dataBetaExport, (object)[
+                        'id'=>$item->id,
+                        'nombre'=>$item->nombre,
+                        'image'=>$item->image,
+                        'formularios'=>$item->conteo,
+                        'coincidencias'=>$conteo
+                    ]);
+                    $testeo++;
+                }
+            }
+        }
+
+        $ultimoAlfa = array();
+        $ultimoBeta = array();
+
+        if(count($dataAlfaExport) > 3){
+            foreach($dataAlfaExport as $key => $item){
+                if($key == 0 || $key == 1 || $key == 2){
+                    $nameImage = $item->image;
+                    if($nameImage <> null){
+                        // $e->image = "test";
+                        $dir = '../resources/images/profile-img/'.$item->image;
+                        if (file_exists($dir) == false) {
+                            $item->image = null;
+                        }else{
+                            // Extensión de la imagen
+                            $type = pathinfo($dir, PATHINFO_EXTENSION);
+                            // Cargando la imagen
+                            $img = file_get_contents($dir);
+                            // Decodificando la imagen en base64
+                            $base64 = 'data:image/' . $type . ';base64,' . base64_encode($img);
+                            $item->image = $base64;          
+                        }
+                    }
+                    array_push($ultimoAlfa, $item);
+                }
+            }
+        }else{
+            foreach($dataAlfaExport as $key => $item){
+                $nameImage = $item->image;
+                if($nameImage <> null){
+                    // $e->image = "test";
+                    $dir = '../resources/images/profile-img/'.$item->image;
+                    if (file_exists($dir) == false) {
+                        $item->image = null;
+                    }else{
+                        // Extensión de la imagen
+                        $type = pathinfo($dir, PATHINFO_EXTENSION);
+                        // Cargando la imagen
+                        $img = file_get_contents($dir);
+                        // Decodificando la imagen en base64
+                        $base64 = 'data:image/' . $type . ';base64,' . base64_encode($img);
+                        $item->image = $base64;          
+                    }
+                }
+            }
+            $ultimoAlfa = $dataAlfaExport;
+        }
+
+        if(count($dataBetaExport) > 3){
+            foreach($dataBetaExport as $key => $item){
+                if($key == 0 || $key == 1 || $key == 2) {
+                    $nameImage = $item->image;
+                    if($nameImage <> null){
+                        // $e->image = "test";
+                        $dir = '../resources/images/profile-img/'.$item->image;
+                        if (file_exists($dir) == false) {
+                            $item->image = null;
+                        }else{
+                            // Extensión de la imagen
+                            $type = pathinfo($dir, PATHINFO_EXTENSION);
+                            // Cargando la imagen
+                            $img = file_get_contents($dir);
+                            // Decodificando la imagen en base64
+                            $base64 = 'data:image/' . $type . ';base64,' . base64_encode($img);
+                            $item->image = $base64;          
+                        }
+                    }
+                    array_push($ultimoBeta, $item);
+                }
+            }
+        }else{
+            foreach($dataBetaExport as $key => $item){
+                $nameImage = $item->image;
+                if($nameImage <> null){
+                    // $e->image = "test";
+                    $dir = '../resources/images/profile-img/'.$item->image;
+                    if (file_exists($dir) == false) {
+                        $item->image = null;
+                    }else{
+                        // Extensión de la imagen
+                        $type = pathinfo($dir, PATHINFO_EXTENSION);
+                        // Cargando la imagen
+                        $img = file_get_contents($dir);
+                        // Decodificando la imagen en base64
+                        $base64 = 'data:image/' . $type . ';base64,' . base64_encode($img);
+                        $item->image = $base64;          
+                    }
+                }
+            }
+            $ultimoBeta = $dataBetaExport;
+        }
+
+        
+
+
+
+
+        return response()->json([
+            'code' => 200, // success
+            'objetoRanking' => $objetoRanking,
+            'dataAlfas' => $ultimoAlfa,
+            'dataBeta' => $ultimoBeta
+        ], 200);
+
+    }
+
 }
-
-
 
 
 ?>

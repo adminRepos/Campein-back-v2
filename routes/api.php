@@ -102,6 +102,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/getLideresBetaRanking/{id_user}', [EstadisticasController::class, 'getLideresBetaRanking']);
 
     Route::get('/getEstadisticasUsuario/{id_user}', [EstadisticasController::class, 'getEstadisticasUsuario']);
+    Route::get('/getEstadisticasHome', [EstadisticasController::class, 'getEstadisticasHome']);
 
 
 
