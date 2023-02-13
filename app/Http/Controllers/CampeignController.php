@@ -222,4 +222,20 @@ class CampeignController extends Controller
             ], 500);
         }
     }
+
+    public function cambioMetaEvidencias(Request $request, $numero){
+        try {
+            $query = DB::select("UPDATE campeigns SET meta_evidencias = ? WHERE id = 2;", [intval($numero)]);
+            return response()->json([
+                'code' => 200, // succes
+                'data' => 'full',
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'code' => 500, // warning
+                'message' => "Error interno del servidor",
+                'error' => $th 
+            ], 500);
+        }
+    }
 }

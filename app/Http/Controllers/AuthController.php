@@ -9,13 +9,14 @@ use App\Models\Role;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use App\Mail\CorreoElectronico;
+use Illuminate\Support\Facades\Mail;
 
 class AuthController extends Controller
 {
 
   // public function register(UserRegisterRequest $request)
-  public function register(Request $request)
-  {
+  public function register(Request $request){
     $requestValidate = $request->validate([
       'nombre' => 'required|string',
       'rol_id' => 'required',
@@ -46,8 +47,7 @@ class AuthController extends Controller
   }
 
 
-  public function login(Request $request)
-  {
+  public function login(Request $request){
     try {
       //code...
       $requestEmail = $request->get('email');
@@ -64,10 +64,30 @@ class AuthController extends Controller
       $userData = User::where('email', '=', $requestEmail)->firstOrFail();
       if($userData->activo == 1){
         $authToken = $userData->createToken('auth_token')->plainTextToken;
+
+        
+        $nameImage = $userData->image;
+        if($nameImage <> null){
+          // $e->image = "test";
+          $dir = '../resources/images/profile-img/'.$userData->image;
+          if (file_exists($dir) == false) {
+            $userData->image = null;
+          }else{
+            // Extensión de la imagen
+            $type = pathinfo($dir, PATHINFO_EXTENSION);
+            // Cargando la imagen
+            $img = file_get_contents($dir);
+            // Decodificando la imagen en base64
+            $base64 = 'data:image/' . $type . ';base64,' . base64_encode($img);
+            $userData->image = $base64;          
+          }
+        }
+      
+
         return response()->json([
           'access_token' => $authToken,
           'token_type' => 'Bearer',
-          'user' => auth()->user()
+          'user' => $userData
         ], 200);
       }else{
         return response()->json([
@@ -92,4 +112,51 @@ class AuthController extends Controller
     ], 200);
   }
   
+  public function resetPass(Request $request, $email, $date){
+    try {
+      $userData = User::where('email', '=', $email)->first();
+      
+      if($userData == null){
+        return response()->json([
+          'code' => 404,
+          'message' => 'El usuario no existe en el sistema',
+        ], 200);
+      }else{
+        // $today = new date('Y-m-d H:i:s');
+        Mail::to($email)->send(new CorreoElectronico($userData->id,($userData->nombre . ' ' . $userData->apellido), 'recuperarPass', '', '', $date));
+        return response()->json([
+          'code' => 200,
+          'message' => 'Envio de correo electronico satisfactorio',
+        ], 200);
+      }
+    } catch (\Throwable $th) {
+      return response()->json([
+        'code' => 500,
+        'message' => 'Error interno del servidor',
+        'error' => $th
+      ], 500);
+    }
+
+  }
+
+  public function changePass(Request $request){
+    // $body = $_REQUEST;
+    if($request->get('pass') == $request->get('confPass')){
+      $userData = User::where('id', '=', $request->get('id'))->first();
+      $userData->password = Hash::make($request->get('pass'));
+      $userData->save();
+      return response()->json([
+        'code' => 200,
+        'message' => 'La contraseña ha sido cambiada exitosamente',
+      ], 200);
+    }else{
+      return response()->json([
+        'code' => 400,
+        'message' => 'Las contraseñas no coinciden',
+        'error' => 'Contraseñas no coinciden',
+      ], 400);
+    }
+  }
+
 }
+

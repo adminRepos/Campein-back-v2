@@ -139,15 +139,44 @@ class EvidenciasController extends Controller
     }
   }
 
-  public function getEvidenciaTable(Request $request){
-    $id_user = $request->get('id_user');
+  public function getUsersEvidencias(Request $request, $id_user){
+    $user = User::find(intval($id_user));
+    $data = null;
+    $queryMeta = DB::select('SELECT meta_evidencias from campeigns where id = 2');
+    if($user->rol_id == 2) {$data = DB::select('CALL get_dataTable_users_evidencias_admin(?)', [$user->rol_id]);}
+    if($user->rol_id == 3) {$data = DB::select('CALL get_dataTable_users_evidencias(?)', [$user->id]);}
 
+    foreach ($data as $e) {
+      $nameImage = $e->image;
+      if($nameImage <> null){
+        // $e->image = "test";
+        $dir = '../resources/images/profile-img/'.$e->image;
+        if (file_exists($dir) == false) {
+          $e->image = null;
+        }else{
+          // Extensión de la imagen
+          $type = pathinfo($dir, PATHINFO_EXTENSION);
+          // Cargando la imagen
+          $img = file_get_contents($dir);
+          // Decodificando la imagen en base64
+          $base64 = 'data:image/' . $type . ';base64,' . base64_encode($img);
+          $e->image = $base64;          
+        }
+      }
+    }
+
+    return json_encode(array(
+      "code" => "200",
+      "meta" => $queryMeta[0]->meta_evidencias,
+      "data" => $data
+    ), 200);
   }
 
   public function getEvidenciasUsuario(Request $request, $id_user)
   {
     try {
 
+      $dataUser = DB::select("CALL get_data_user_evidencias_one(?);", [intval($id_user)]);
       $data = DB::select("SELECT eu.id, eu.red_social, eu.url, eu.image, eu.created_at, eu.activo FROM evidencias_user AS eu WHERE eu.id_user = ?;", [intval($id_user)]);
 
       foreach ($data as $e) {
@@ -168,9 +197,29 @@ class EvidenciasController extends Controller
           }
         }
       }
+
+      $dataUserExport = $dataUser[0];
+
+      $nameImage = $dataUserExport->image;
+      if($nameImage <> null){
+        $dir = '../resources/images/profile-img/'.$dataUserExport->image;
+        if (file_exists($dir) == false) {
+          $dataUserExport->image = null;
+        }else{
+          // Extensión de la imagen
+          $type = pathinfo($dir, PATHINFO_EXTENSION);
+          // Cargando la imagen
+          $img = file_get_contents($dir);
+          // Decodificando la imagen en base64
+          $base64 = 'data:image/' . $type . ';base64,' . base64_encode($img);
+          $dataUserExport->image = $base64;          
+        }
+      }
+
       return json_encode(array(
         "code" => "200",
-        "data" => $data
+        "data" => $data,
+        "dataUser" => $dataUserExport
       ), 200);
     } catch (\Throwable $th) {
       return json_encode(array(
@@ -215,7 +264,7 @@ class EvidenciasController extends Controller
   }
 
   public function getReporteEvidencias(Request $request, $id_user){
-    try {
+    // try {
       $data = null;
 
       $datosUser = DB::select("SELECT concat(u.nombre, ' ', u.apellido) as nombre, r.nombre_publico as rol, r.jerarquia, r.campeigns_id from users as u inner join roles as r on r.id = u.rol_id where u.id = ? limit 1;", [intval($id_user)]);
@@ -256,21 +305,34 @@ class EvidenciasController extends Controller
         'evidencias' => count($data)
       ]);
 
-      $pdf = PDF::loadView('reporte-evidencias-total-mobile-pdf', ['user'=>$user, 'data' => $data, 'i'=>0]);
 
-      return response()->json([
-          'code' => 200, // succes
-          'data' => base64_encode($pdf->stream()),
-      ], 200);
+      $dir = '../resources/images/pdfImages/logo-campein.png';
+      $type = pathinfo($dir, PATHINFO_EXTENSION);
+      $img = file_get_contents($dir);
+      $base64 = 'data:image/' . $type . ';base64,' . base64_encode($img);
 
-    } catch (\Throwable $th) {
-        return response()->json([
-            'code' => 500, // warning
-            'message' => "Error interno del servidor",
-            'error' => $th 
-        ], 500);
-        //throw $th;
-    }
+      $dir2 = '../resources/images/pdfImages/circle-user.svg';
+      $type2 = pathinfo($dir2, PATHINFO_EXTENSION);
+      $img2 = file_get_contents($dir2);
+      $base64_2 = 'data:image/' . $type2 . ';base64,' . base64_encode($img2);
+
+      $pdf = PDF::loadView('reporte-evidencias-total-mobile-pdf', ['user'=>$user, 'data' => $data, 'i'=>0, 'imagePDF1' => $base64, 'imagePDF2'=> $base64_2,]);
+
+      return $pdf->stream();
+
+      // return response()->json([
+      //     'code' => 200, // succes
+      //     'data' => base64_encode($pdf->stream()),
+      // ], 200);
+
+    // } catch (\Throwable $th) {
+    //     return response()->json([
+    //         'code' => 500, // warning
+    //         'message' => "Error interno del servidor",
+    //         'error' => $th 
+    //     ], 500);
+    //     //throw $th;
+    // }
   }
 
 

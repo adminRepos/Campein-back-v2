@@ -9,6 +9,8 @@ use App\Models\Role;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use App\Mail\CorreoElectronico;
+use Illuminate\Support\Facades\Mail;
 
 class UsuarioController extends Controller
 {
@@ -44,6 +46,7 @@ class UsuarioController extends Controller
           ]);
           // $insert = User::where('email', '=', $body['email']);
           if(intval($body['rol_id']) == 4) $query = DB::select("INSERT INTO users_users (mayor, menor) VALUES (?, ?);", [intval($body['id_user_session']), intval($newUser->id)]);
+          Mail::to($newUser->email)->send(new CorreoElectronico('0',($newUser->nombre . ' ' . $newUser->apellido), 'registroUsuario', $newUser->email, $body['password'], ''));
           return response()->json([
             'code' => 201, // success
             'data' => $newUser,
@@ -90,6 +93,7 @@ class UsuarioController extends Controller
               ]);
               // $insert = User::where('email', '=', $body['email']);
               if(intval($body['rol_id']) == 4) $query = DB::select("INSERT INTO users_users (mayor, menor) VALUES (?, ?);", [intval($body['id_user_session']), intval($newUser->id)]);
+              Mail::to($newUser->email)->send(new CorreoElectronico('0',($newUser->nombre . ' ' . $newUser->apellido), 'registroUsuario', $newUser->email, $body['password'], ''));
               return response()->json([
                 'code' => 201, // success
                 'data' => $newUser,
@@ -531,6 +535,8 @@ class UsuarioController extends Controller
   public function getUsersBeta(Request $request, $id_user){
     $user = User::find($id_user);
     if($user->rol_id == 2){
+      $queryMeta = DB::select('SELECT meta FROM campeigns where id = 2;');
+      $meta = $queryMeta[0]->meta;
       $data = DB::select('CALL select_betas_admin()');
       foreach ($data as $e) {
         $nameImage = $e->image;
@@ -551,9 +557,12 @@ class UsuarioController extends Controller
         }
       }
       return response()->json([
+        'meta' => $meta,
         'data' => $data,
       ], 200);
     }else{
+      $queryMeta = DB::select('SELECT meta FROM campeigns where id = 2;');
+      $meta = $queryMeta[0]->meta;
       $data = DB::select('CALL sp_get_my_users('.$id_user.')');
       foreach ($data as $e) {
         $nameImage = $e->image;
@@ -574,6 +583,7 @@ class UsuarioController extends Controller
         }
       }
       return response()->json([
+        'meta' => $meta,
         'data' => $data,
       ], 200);
     }
@@ -631,6 +641,33 @@ class UsuarioController extends Controller
     }
 
 
+  }
+
+  public function upAlfa(Request $request, $id_user){
+    try {
+      $user = User::find($id_user);
+      $message = '';
+      $code = 0;
+      if($user->rol_id == 4){
+        $user->rol_id = 3;
+        $user->save();
+        $message = 'Usuario ascendido exitosamente';
+        $code = 200;
+      }else{
+        $message = 'El usuario no puede ser modificado';
+        $code = 400;
+      }
+      return response()->json([
+        'code' => $code,
+        'message' => $message
+      ], $code);
+    } catch (\Throwable $th) {
+      return response()->json([
+        'code' => 500,
+        'message' => 'Error interno del servidor',
+        'error' => $th
+      ], 500);
+    }
   }
 
 }

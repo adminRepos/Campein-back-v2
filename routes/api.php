@@ -71,13 +71,15 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     
     Route::get('/getUserGestion/{id_user}', [UsuarioController::class, 'getUserGestion']);
     Route::get('/cambioMeta/{numero}', [CampeignController::class, 'cambioMeta']);
+    Route::get('/cambioMetaEvidencias/{numero}', [CampeignController::class, 'cambioMetaEvidencias']);
     // reporte Excel
     Route::get('/getDataExcel/{id_user}/{datos}', [CampeignController::class, 'getDataExcel']);
     Route::get('/getDataExcelAdminMobile/{rol_id}', [CampeignController::class, 'getDataExcelAdminMobile']);
     // EVIDENCIAS
-    Route::get('/getEvidenciaTable/{id_user}', [EvidenciasController::class, 'getEvidenciaTable']);
+    Route::get('/getUsersEvidencias/{id_user}', [EvidenciasController::class, 'getUsersEvidencias']);
     // NOTIFICACIONES
     Route::post('/insertNotificaciones', [NotificacionesController::class, 'insertNotificaciones']);
+    Route::get('/getNotificacionesTemp', [NotificacionesController::class, 'getNotificacionesTemp']);
     // NOTICIAS
     Route::post('/insertNoticia', [NoticiasController::class, 'insertNoticia']);
     Route::get('/selectNoticiasxCampeign/{id_user}', [NoticiasController::class, 'selectNoticias']);
@@ -86,6 +88,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/getUsersAlfa/{id_user}', [UsuarioController::class, 'getUsersAlfa']);
     Route::get('/getUsersAlfaData/{id_user}', [UsuarioController::class, 'getUsersAlfaData']);
     Route::get('/getUsersBeta/{id_user}', [UsuarioController::class, 'getUsersBeta']);
+
+    Route::get('/upAlfa/{id_user}', [UsuarioController::class, 'upAlfa']);
 
     // reporte pdf mobile
     Route::get('/getPDF/{id_user}/{datos}', [CampeignController::class, 'getPDF']);
@@ -111,4 +115,6 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::get('/resetPass/{email}/{date}', [AuthController::class, 'resetPass']);
+Route::post('/resetPass', [AuthController::class, 'changePass']);
 

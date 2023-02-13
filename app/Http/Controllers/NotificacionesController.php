@@ -96,8 +96,43 @@ class NotificacionesController extends Controller
       ], 400);
     }
   }
-
+  
   private function validarCamposInsert($body){
     return true;
+  }
+  
+  public function getNotificacionesTemp(Request $request){
+    try {
+      //code...
+      $data = DB::select('CALL get_notificaciones_temp()');
+      foreach ($data as $e) {
+        $nameImage = $e->image;
+        if($nameImage <> null){
+          // $e->image = "test";
+          $dir = '../resources/images/notificaciones/'.$e->image;
+          if (file_exists($dir) == false) {
+            $e->image = null;
+          }else{
+            // Extensión de la imagen
+            $type = pathinfo($dir, PATHINFO_EXTENSION);
+            // Cargando la imagen
+            $img = file_get_contents($dir);
+            // Decodificando la imagen en base64
+            $base64 = 'data:image/' . $type . ';base64,' . base64_encode($img);
+            $e->image = $base64;          
+          }
+        }
+      }
+      return response()->json([
+        'code' => 200, // warning
+        'data' => $data
+      ], 200);
+    } catch (\Throwable $th) {
+      return response()->json([
+        'code' => 500, // warning
+        'message' => 'Error interno del servidor',
+        'error' => $th
+      ], 500);
+    }
   }
 }

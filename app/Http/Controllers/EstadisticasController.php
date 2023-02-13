@@ -98,7 +98,7 @@ class EstadisticasController extends Controller{
                             $item->image = $base64;          
                         }
                     }
-                    $porcentaje = ($item->conteo * $meta[0]->meta)/100;
+                    $porcentaje = ($item->conteo * 1)/$meta[0]->meta;
                     array_push($data, (object)['nombre' => $item->nombre, 'image'=> $item->image, 'conteo'=>$item->conteo, 'porcentaje'=>$porcentaje]);
                 }
             }
@@ -452,11 +452,6 @@ class EstadisticasController extends Controller{
             }
             $ultimoBeta = $dataBetaExport;
         }
-
-        
-
-
-
 
         return response()->json([
             'code' => 200, // success
