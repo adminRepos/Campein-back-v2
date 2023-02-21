@@ -4,4 +4,4 @@
 <h3>Contraseña: {{$pass}}</h3>
 
 <p><b>No compartas estás credenciales a ninguna persona.</b></p>
-<a href="http://34.172.75.160/#/auth/login">Click aqui para ir al portal</a>
+<a href="http://34.123.196.247/#/auth/login">Click aqui para ir al portal</a>

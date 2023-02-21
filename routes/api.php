@@ -98,6 +98,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/getEvidenciasUsuario/{id_user}', [EvidenciasController::class, 'getEvidenciasUsuario']);
     Route::get('/getReporteEvidenciasUsuario/{id_user}', [EvidenciasController::class, 'getReporteEvidenciasUsuario']);
     Route::get('/getReporteEvidencias/{id_user}', [EvidenciasController::class, 'getReporteEvidencias']);
+    Route::get('/getXlsUsuario/{id_user}', [EvidenciasController::class, 'getXlsUsuario']);
     
     // Estadisticas
     Route::get('/getEstadisticasTotalUsuarios/{id_user}', [EstadisticasController::class, 'getEstadisticasTotalUsuarios']);

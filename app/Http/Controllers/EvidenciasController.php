@@ -335,7 +335,22 @@ class EvidenciasController extends Controller
     // }
   }
 
-
+  // get_report_xls_evidencias_x_usuario
+  public function getXlsUsuario(Request $request, $id_user){
+    try {
+      $query = DB::select("CALL get_report_xls_evidencias_x_usuario(?);", [intval($id_user)]);
+      return json_encode(array(
+        "code" => "200",
+        "data" => $query,
+      ), 200);
+    } catch (\Throwable $th) {
+      return json_encode(array(
+        "code" => "500",
+        "message" => "Error interno del servidor",
+        "error" => $th
+      ), 500);
+    }
+  }
 
 
 }
