@@ -98,7 +98,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/getEvidenciasUsuario/{id_user}', [EvidenciasController::class, 'getEvidenciasUsuario']);
     Route::get('/getReporteEvidenciasUsuario/{id_user}', [EvidenciasController::class, 'getReporteEvidenciasUsuario']);
     Route::get('/getReporteEvidencias/{id_user}', [EvidenciasController::class, 'getReporteEvidencias']);
-    Route::get('/getXlsUsuario/{id_user}', [EvidenciasController::class, 'getXlsUsuario']);
+    Route::get('/getXlsEvidencias/{id_user}/{isLeader}', [EvidenciasController::class, 'getXlsEvidencias']);
     
     // Estadisticas
     Route::get('/getEstadisticasTotalUsuarios/{id_user}', [EstadisticasController::class, 'getEstadisticasTotalUsuarios']);
@@ -109,9 +109,6 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/getEstadisticasUsuario/{id_user}', [EstadisticasController::class, 'getEstadisticasUsuario']);
     Route::get('/getEstadisticasHome', [EstadisticasController::class, 'getEstadisticasHome']);
 
-
-
-    
 });
 
 Route::post('/register', [AuthController::class, 'register']);

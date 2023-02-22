@@ -48,7 +48,7 @@ class AuthController extends Controller
 
 
   public function login(Request $request){
-    try {
+    // try {
       //code...
       $requestEmail = $request->get('email');
       $requestPassword = $request->get('password');
@@ -96,14 +96,14 @@ class AuthController extends Controller
           comuníquese con su líder',
         ], 403);
       }
-    } catch (\Throwable $th) {
-      return response()->json([
-        'code' => 500,
-        'message' => 'Error interno del servidor',
-        'error' => $th
-      ], 500);
+    // } catch (\Throwable $th) {
+    //   return response()->json([
+    //     'code' => 500,
+    //     'message' => 'Error interno del servidor',
+    //     'error' => $th
+    //   ], 500);
       //throw $th;
-    }
+    // }
   }
 
   public function getSession(Request $request){

@@ -336,9 +336,44 @@ class EvidenciasController extends Controller
   }
 
   // get_report_xls_evidencias_x_usuario
-  public function getXlsUsuario(Request $request, $id_user){
+  public function getXlsEvidencias(Request $request, $id_user, $isLeader){
     try {
-      $query = DB::select("CALL get_report_xls_evidencias_x_usuario(?);", [intval($id_user)]);
+      $query = null;
+      if($isLeader == 0){
+        $query = DB::select("SELECT 
+            e.red_social,
+            e.url,
+            e.image,
+            e.created_at
+          from evidencias_user as e 
+          where e.id_user = ?;", [intval($id_user)]);
+      }else{
+        $user = User::find(intval($id_user));
+        if($user->rol_id == 2){
+          $query = DB::select("SELECT 
+            concat(u.nombre, ' ', u.apellido) as user,
+            e.red_social,
+            e.url,
+            e.image,
+            e.created_at
+          from evidencias_user as e
+          inner join users as u on u.id = e.id_user
+          inner join roles as r on r.id = u.rol_id
+          where r.campeigns_id = 2 and r.id <> 2;");
+        }else{
+          $query = DB::select("SELECT 
+            concat(u.nombre, ' ', u.apellido) as user,
+            e.red_social,
+            e.url,
+            e.image,
+            e.created_at
+          from evidencias_user as e
+          inner join users as u on u.id = e.id_user
+          inner join users_users as uu on uu.menor = e.id_user
+          where uu.mayor = ?;", [intval($id_user)]);
+        }
+      }
+      // $query = DB::select("CALL get_report_xls_evidencias_x_usuario(?);", [intval($id_user)]);
       return json_encode(array(
         "code" => "200",
         "data" => $query,
