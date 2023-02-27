@@ -172,8 +172,7 @@ class EvidenciasController extends Controller
     ), 200);
   }
 
-  public function getEvidenciasUsuario(Request $request, $id_user)
-  {
+  public function getEvidenciasUsuario(Request $request, $id_user){
     try {
 
       $dataUser = DB::select("CALL get_data_user_evidencias_one(?);", [intval($id_user)]);
@@ -244,8 +243,27 @@ class EvidenciasController extends Controller
         'rol' => $datosUser[0]->rol,
         'evidencias' => count($data)
       ]);
+      $dir = '../resources/images/pdfImages/logo-campein.png';
+      $type = pathinfo($dir, PATHINFO_EXTENSION);
+      $img = file_get_contents($dir);
+      $base64 = 'data:image/' . $type . ';base64,' . base64_encode($img);
 
-      $pdf = PDF::loadView('reporte-evidencias-usuario-mobile-pdf', ['user'=>$user, 'data' => $data, 'i'=>0]);
+      $dir2 = '../resources/images/pdfImages/circle-user.svg';
+      $type2 = pathinfo($dir2, PATHINFO_EXTENSION);
+      $img2 = file_get_contents($dir2);
+      $base64_2 = 'data:image/' . $type2 . ';base64,' . base64_encode($img2);
+      $date = date('d/m/Y - H:m');
+
+      $parametrosPDF = [
+        'user'=>$user, 
+        'data' => $data, 
+        'i'=> 0, 
+        'imagePDF1' => $base64, 
+        'imagePDF2'=> $base64_2,
+        'date' => $date
+      ];
+
+      $pdf = PDF::loadView('reporte-evidencias-usuario-mobile-pdf',$parametrosPDF )->setPaper('a4', 'landscape');;
 
       // return $pdf->stream();
       return response()->json([
@@ -264,7 +282,7 @@ class EvidenciasController extends Controller
   }
 
   public function getReporteEvidencias(Request $request, $id_user){
-    // try {
+    try {
       $data = null;
 
       $datosUser = DB::select("SELECT concat(u.nombre, ' ', u.apellido) as nombre, r.nombre_publico as rol, r.jerarquia, r.campeigns_id from users as u inner join roles as r on r.id = u.rol_id where u.id = ? limit 1;", [intval($id_user)]);
@@ -315,24 +333,34 @@ class EvidenciasController extends Controller
       $type2 = pathinfo($dir2, PATHINFO_EXTENSION);
       $img2 = file_get_contents($dir2);
       $base64_2 = 'data:image/' . $type2 . ';base64,' . base64_encode($img2);
+      $date = date('d/m/Y - H:m');
 
-      $pdf = PDF::loadView('reporte-evidencias-total-mobile-pdf', ['user'=>$user, 'data' => $data, 'i'=>0, 'imagePDF1' => $base64, 'imagePDF2'=> $base64_2,]);
+      $parametrosPDF = [
+        'user'=>$user, 
+        'data' => $data, 
+        'i'=> 0, 
+        'imagePDF1' => $base64, 
+        'imagePDF2'=> $base64_2,
+        'date' => $date
+      ];
 
-      return $pdf->stream();
+      $pdf = PDF::loadView('reporte-evidencias-total-mobile-pdf', $parametrosPDF)->setPaper('a4', 'landscape');
 
-      // return response()->json([
-      //     'code' => 200, // succes
-      //     'data' => base64_encode($pdf->stream()),
-      // ], 200);
+      // return $pdf->stream();
 
-    // } catch (\Throwable $th) {
-    //     return response()->json([
-    //         'code' => 500, // warning
-    //         'message' => "Error interno del servidor",
-    //         'error' => $th 
-    //     ], 500);
-    //     //throw $th;
-    // }
+      return response()->json([
+          'code' => 200, // succes
+          'data' => base64_encode($pdf->stream()),
+      ], 200);
+
+    } catch (\Throwable $th) {
+        return response()->json([
+            'code' => 500, // warning
+            'message' => "Error interno del servidor",
+            'error' => $th 
+        ], 500);
+        //throw $th;
+    }
   }
 
   // get_report_xls_evidencias_x_usuario

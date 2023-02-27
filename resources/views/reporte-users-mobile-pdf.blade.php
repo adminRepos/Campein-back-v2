@@ -5,61 +5,112 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reporte usuarios</title>
+
+    <style type="text/css">
+
+        @font-face {
+            font-family : "Roboto";
+            font-style: normal;
+            font-weight : normal;
+            src: url("http://localhost:6001/app/resources/fonts/Roboto-Black.ttf") format("truetype");
+        }
+
+        .t-header, .t-body{
+            width: 100%;
+            margin-bottom: 30px;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .t-body{
+            border-collapse: separate;
+            border-spacing: 0px 30px;
+        }
+
+        #idTbody tr td{
+            background-color: #FFFFFF;
+            /* min-height: 30px */
+        }
+        
+        #idTbody tr:nth-child(odd) td {
+            background-color: #F1F1F1;
+            /* background-color: #FFFFFF; */
+        }
+
+        .title{
+            color: #DB356D;
+            text-align: center;
+            top: 0;
+        }
+
+    </style>
 </head>
 <body>
 
-    <table>
+    <table class="t-header">
         <thead>
             <tr>
-                <th></th>
-                <th colspan="3">Datos Usuario</th>
-                <th colspan="15">Datos prospecto (ciudadano)</th>
-            </tr>
-            <tr>
-                <th>#</th>
-                <th>Nombre usuario</th>
-                <th>Email usuario</th>
-                <th>Rol</th>
-                <th>Tipo de documento de identificacion</th>
-                <th>Numero de documento de identificacion</th>
-                <th>Genero</th>
-                <th>Primer nombre</th>
-                <th>Segundo nombre</th>
-                <th>Primer apellido</th>
-                <th>Segundo apellido</th>
-                <th>Dirección</th>
-                <th>Localidad</th>
-                <th>Telefono</th>
-                <th>Whatsapp</th>
-                <th>Fecha registro</th>
-                <th>Rango edad</th>
-                <th>Longitud</th>
-                <th>Latitud</th>
+                <th ><img src="<?= $imagePDF1 ?>" alt="" style="position: relative;" ></th>
+                <th >
+                    <h3 class="title"><img src="<?=  $imagePDF2 ?>">DATOS USUARIO</h3>
+                </th>
+                <th style="font-family: 'Roboto', sans-serif;"><?= $date ?></th>
             </tr>
         </thead>
-        <tbody>
+    </table>
+
+    <table class="t-body">
+        <thead>
+            <!-- <tr>
+                <th ></th>
+                <th colspan="3">Datos Usuario</th>
+                <th colspan="15">Datos prospecto (ciudadano)</th>
+            </tr> -->
+            <tr>
+                <th style="word-wrap: break-word;">#</th>
+                <th style="max-width: 100px !important; max-width: 100px !important; word-wrap: break-word;">Nombre usuario</th>
+                <!-- <th style="max-width: 100px !important; word-wrap: break-word;">Email usuario</th> -->
+                <th style="max-width: 100px !important; word-wrap: break-word;">Rol</th>
+                <th style="max-width: 100px !important; word-wrap: break-word;">T.I.</th>
+                <th style="max-width: 100px !important; word-wrap: break-word;"># I.</th>
+                <th style="max-width: 100px !important; word-wrap: break-word;">Genero</th>
+                <th style="max-width: 100px !important; word-wrap: break-word;">Primer nombre</th>
+                <!-- <th style="max-width: 100px !important; word-wrap: break-word;">Segundo nombre</th> -->
+                <th style="max-width: 100px !important; word-wrap: break-word;">Primer apellido</th>
+                <!-- <th style="max-width: 100px !important; word-wrap: break-word;">Segundo apellido</th> -->
+                <!-- <th style="max-width: 100px !important; word-wrap: break-word;">Dirección</th> -->
+                <th style="max-width: 100px !important; word-wrap: break-word;">Localidad</th>
+                <th style="max-width: 100px !important; word-wrap: break-word;">Email</th>
+                <th style="max-width: 100px !important; word-wrap: break-word;">Telefono</th>
+                <!-- <th style="max-width: 100px !important; word-wrap: break-word;">Whatsapp</th> -->
+                <th style="max-width: 100px !important; word-wrap: break-word;">Fecha registro</th>
+                <th style="max-width: 100px !important; word-wrap: break-word;">Rango edad</th>
+                <!-- <th style="max-width: 100px !important; word-wrap: break-word;">Longitud</th> -->
+                <!-- <th style="max-width: 100px !important; word-wrap: break-word;">Latitud</th> -->
+            </tr>
+        </thead>
+        <tbody id="idTbody">
             @foreach($data as $item)
                 <tr>
-                    <td>{{ ++$i }}</td>
-                    <td>{{ $item->nombre_user }}</td>
-                    <td>{{ $item->email }}</td>
-                    <td>{{ $item->rol }}</td>
-                    <td>{{ $item->tipo_documento }}</td>
-                    <td>{{ $item->identificacion }}</td>
-                    <td>{{ $item->genero }}</td>
-                    <td>{{ $item->primer_nombre }}</td>
-                    <td>{{ $item->segundo_nombre }}</td>
-                    <td>{{ $item->primer_apellido }}</td>
-                    <td>{{ $item->segundo_apellido }}</td>
-                    <td>{{ $item->direccion }}</td>
-                    <td>{{ $item->localidad }}</td>
-                    <td>{{ $item->email_p }}</td>
-                    <td>{{ $item->telefono }}</td>
-                    <td>{{ $item->whatsapp }}</td>
-                    <td>{{ $item->fecha_registro }}</td>
-                    <td>{{ $item->rango_edad }}</td>
-                    <td>{{ $item->longitud }}</td>
-                    <td>{{ $item->latitud }}</td>
+                    <td style="word-wrap: break-word; font-size:15px;">{{ ++$i }}</td>
+                    <td style="max-width: 100px !important; word-wrap: break-word; font-size:15px;">{{ $item->nombre_user }}</td>
+                    <!-- <td style="word-wrap: break-word; font-size:15px;">{{ $item->email }}</td> -->
+                    <td style="max-width: 100px !important; word-wrap: break-word; font-size:15px;">{{ $item->rol }}</td>
+                    <td style="max-width: 100px !important; word-wrap: break-word; font-size:15px;">{{ $item->tipo_documento }}</td>
+                    <td style="max-width: 100px !important; word-wrap: break-word; font-size:15px;">{{ $item->identificacion }}</td>
+                    <td style="max-width: 100px !important; word-wrap: break-word; font-size:15px;">{{ $item->genero }}</td>
+                    <td style="max-width: 100px !important; word-wrap: break-word; font-size:15px;">{{ $item->primer_nombre }}</td>
+                    <!-- <td style="max-width: 100px !important; word-wrap: break-word; font-size:15px;">{{ $item->segundo_nombre }}</td> -->
+                    <td style="max-width: 100px !important; word-wrap: break-word; font-size:15px;">{{ $item->primer_apellido }}</td>
+                    <!-- <td style="max-width: 100px !important; word-wrap: break-word; font-size:15px;">{{ $item->segundo_apellido }}</td> -->
+                    <!-- <td style="max-width: 100px !important; word-wrap: break-word; font-size:15px;">{{ $item->direccion }}</td> -->
+                    <td style="max-width: 100px !important; word-wrap: break-word; font-size:15px;">{{ $item->localidad }}</td>
+                    <td style="max-width: 100px !important; word-wrap: break-word; font-size:15px;">{{ $item->email_p }}</td>
+                    <td style="max-width: 100px !important; word-wrap: break-word; font-size:15px;">{{ $item->telefono }}</td>
+                    <!-- <td style="max-width: 100px !important; word-wrap: break-word; font-size:15px;">{{ $item->whatsapp }}</td> -->
+                    <td style="max-width: 100px !important; word-wrap: break-word; font-size:15px;">{{ $item->fecha_registro }}</td>
+                    <td style="max-width: 100px !important; word-wrap: break-word; font-size:15px;">{{ $item->rango_edad }}</td>
+                    <!-- <td style="max-width: 100px !important; word-wrap: break-word; font-size:15px;">{{ $item->longitud }}</td> -->
+                    <!-- <td style="max-width: 100px !important; word-wrap: break-word; font-size:15px;">{{ $item->latitud }}</td> -->
                 </tr>
             @endforeach
         </tbody>

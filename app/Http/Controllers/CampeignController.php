@@ -105,11 +105,31 @@ class CampeignController extends Controller
             }else if($datos == 0){
                 $data = DB::select("CALL get_data_report_user(?)", [$user->id]);
             }
-
-            $pdf = PDF::loadView('reporte-users-mobile-pdf', ['data' => $data, 'rol_id' => $user->rol_id, 'i'=>0]);
+        
+        
+            $dir = '../resources/images/pdfImages/logo-campein.png';
+            $type = pathinfo($dir, PATHINFO_EXTENSION);
+            $img = file_get_contents($dir);
+            $base64 = 'data:image/' . $type . ';base64,' . base64_encode($img);
+    
+            $dir2 = '../resources/images/pdfImages/circle-user.svg';
+            $type2 = pathinfo($dir2, PATHINFO_EXTENSION);
+            $img2 = file_get_contents($dir2);
+            $base64_2 = 'data:image/' . $type2 . ';base64,' . base64_encode($img2);
+            $date = date('d/m/Y - H:m');
+    
+            $parametrosPDF = [
+            'data' => $data, 
+            'i'=> 0, 
+            'imagePDF1' => $base64, 
+            'imagePDF2'=> $base64_2,
+            'date' => $date
+            ];
+    
+            $pdf = PDF::loadView('reporte-users-mobile-pdf', $parametrosPDF)->setPaper('a4', 'landscape');
+    
             // return $pdf->stream();
-
-            
+    
             return response()->json([
                 'code' => 200, // succes
                 'data' => base64_encode($pdf->stream()),
@@ -134,7 +154,26 @@ class CampeignController extends Controller
             if($rol_id == 'beta') $rol = 4;
             $data = DB::select("CALL get_data_rol_report_admin(?)", [$rol]);
 
-            $pdf = PDF::loadView('reporte-users-mobile-pdf', ['data' => $data, 'i'=>0]);
+            $dir = '../resources/images/pdfImages/logo-campein.png';
+            $type = pathinfo($dir, PATHINFO_EXTENSION);
+            $img = file_get_contents($dir);
+            $base64 = 'data:image/' . $type . ';base64,' . base64_encode($img);
+    
+            $dir2 = '../resources/images/pdfImages/circle-user.svg';
+            $type2 = pathinfo($dir2, PATHINFO_EXTENSION);
+            $img2 = file_get_contents($dir2);
+            $base64_2 = 'data:image/' . $type2 . ';base64,' . base64_encode($img2);
+            $date = date('d/m/Y - H:m');
+    
+            $parametrosPDF = [
+            'data' => $data, 
+            'i'=> 0, 
+            'imagePDF1' => $base64, 
+            'imagePDF2'=> $base64_2,
+            'date' => $date
+            ];
+
+            $pdf = PDF::loadView('reporte-users-mobile-pdf', $parametrosPDF)->setPaper('a4', 'landscape');;
             // return $pdf->stream();
  
             return response()->json([
