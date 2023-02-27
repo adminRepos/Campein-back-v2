@@ -462,6 +462,28 @@ class EstadisticasController extends Controller{
 
     }
 
+    public function getEstadisticaProspectosMeses(Request $request, $id_user, $ano){
+        try {
+            $data = DB::select("SELECT 
+                count(p.id) as conteo,
+                MONTH(p.created_at) as mes
+            from prospectos as p
+            where year(p.created_at) = ? and p.user_id = ?
+            group by mes;", [$ano, $id_user]);
+    
+            return response()->json([
+                'code' => 200, // success
+                'data' => $data
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'code' => 500, // warning
+                'message' => "Error interno del servidor",
+                'error' => $th 
+            ], 500);
+        }
+    }
+
 }
 
 
