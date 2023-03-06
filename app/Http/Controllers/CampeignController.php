@@ -126,7 +126,7 @@ class CampeignController extends Controller
             'date' => $date
             ];
     
-            $pdf = PDF::loadView('reporte-users-mobile-pdf', $parametrosPDF)->setPaper('a4', 'landscape');
+            $pdf = PDF::loadView('reporte-users-mobile-pdf', $parametrosPDF)->setPaper('A3', 'landscape');
     
             // return $pdf->stream();
     
