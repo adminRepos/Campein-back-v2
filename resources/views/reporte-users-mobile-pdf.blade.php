@@ -53,7 +53,7 @@
                 <th >
                     <h3 class="title"><img src="<?=  $imagePDF2 ?>">DATOS USUARIO</h3>
                 </th>
-                {{-- <th style="font-family: 'Roboto', sans-serif;"><?= $date ?></th> --}}
+                <th style="font-family: 'Roboto', sans-serif;"><?= $date ?></th>
             </tr>
         </thead>
     </table>

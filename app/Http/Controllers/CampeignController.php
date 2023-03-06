@@ -116,7 +116,7 @@ class CampeignController extends Controller
             $type2 = pathinfo($dir2, PATHINFO_EXTENSION);
             $img2 = file_get_contents($dir2);
             $base64_2 = 'data:image/' . $type2 . ';base64,' . base64_encode($img2);
-            $date = date('d/m/Y - H:m');
+            $date = date('d/m/Y');
     
             $parametrosPDF = [
             'data' => $data, 
@@ -126,7 +126,7 @@ class CampeignController extends Controller
             'date' => $date
             ];
     
-            $pdf = PDF::loadView('reporte-users-mobile-pdf', $parametrosPDF)->setPaper('A3', 'landscape');
+            $pdf = PDF::loadView('reporte-users-mobile-pdf', $parametrosPDF)->setPaper(array(0,0,1000,1700), 'landscape');
     
             // return $pdf->stream();
     
