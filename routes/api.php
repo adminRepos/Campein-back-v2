@@ -79,7 +79,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/getUsersEvidencias/{id_user}', [EvidenciasController::class, 'getUsersEvidencias']);
     // NOTIFICACIONES
     Route::post('/insertNotificaciones', [NotificacionesController::class, 'insertNotificaciones']);
-    Route::get('/getNotificacionesTemp', [NotificacionesController::class, 'getNotificacionesTemp']);
+    Route::get('/getNotificacionesTemp/{inTipo_user}', [NotificacionesController::class, 'getNotificacionesTemp']);
     // NOTICIAS
     Route::post('/insertNoticia', [NoticiasController::class, 'insertNoticia']);
     Route::get('/selectNoticiasxCampeign/{id_user}', [NoticiasController::class, 'selectNoticias']);
@@ -108,7 +108,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     Route::get('/getEstadisticasUsuario/{id_user}', [EstadisticasController::class, 'getEstadisticasUsuario']);
     Route::get('/getEstadisticasHome', [EstadisticasController::class, 'getEstadisticasHome']);
-    Route::get('/getEstadisticaProspectosMeses/{id_user}/{ano}', [EstadisticasController::class, 'getEstadisticaProspectosMeses']);
+    Route::get('/getEstadisticaProspectosMeses/{id_user}/{ano}/{mes}/{hoy}/{ayer}', [EstadisticasController::class, 'getEstadisticaProspectosMeses']);
 
 });
 

@@ -101,10 +101,10 @@ class NotificacionesController extends Controller
     return true;
   }
   
-  public function getNotificacionesTemp(Request $request){
+  public function getNotificacionesTemp(Request $request, $tipo_user){
     try {
       //code...
-      $data = DB::select('CALL get_notificaciones_temp()');
+      $data = DB::select('CALL get_notificaciones_temp(?)', [ intval($tipo_user) ]);
       foreach ($data as $e) {
         $nameImage = $e->image;
         if($nameImage <> null){

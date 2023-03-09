@@ -462,14 +462,17 @@ class EstadisticasController extends Controller{
 
     }
 
-    public function getEstadisticaProspectosMeses(Request $request, $id_user, $ano){
+    public function getEstadisticaProspectosMeses(Request $request, $id_user, $ano, $mes, $hoy, $ayer){
         try {
             $data = DB::select("SELECT 
                 count(p.id) as conteo,
-                MONTH(p.created_at) as mes
+                HOUR  (p.created_at) as hour,
+                DAY (p.created_at) as day,
+                MONTH  (p.created_at) as month
             from prospectos as p
-            where year(p.created_at) = ? and p.user_id = ?
-            group by mes;", [$ano, $id_user]);
+            where MONTH  (p.created_at)= $mes and p.user_id = $id_user and year(p.created_at) = $ano
+            and DAY (p.created_at) = $hoy or DAY (p.created_at) = $ayer and p.user_id = $id_user and MONTH  (p.created_at)= $mes and year(p.created_at) = $ano
+            group by hour, day, month;");
     
             return response()->json([
                 'code' => 200, // success
