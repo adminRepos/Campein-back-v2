@@ -125,23 +125,8 @@ class NotificacionesController extends Controller
       //code...
 
       // obtener listado de notificaciones para mostrar en el portal
-        $data = DB::select("select 
-        n.id,
-        n.id_user_send, 
-            (select concat(u.nombre, ' ', u.apellido) from users as u where u.id = n.id_user_send) as nombre_usuario,
-            (select u.email from users as u where u.id = n.id_user_send) as correo_usuario,
-            n.image, 
-            n.titulo, 
-            n.mensaje, 
-            n.tipo_user, 
-            n.url, 
-            n.created_at,
-            n.Leido
-        from notificaciones as n
-        inner join users as u on u.id = n.id_user_send
-        inner join roles as r on r.id = u.rol_id
-        where r.campeigns_id = 2 and  tipo_user = $id_user or n.id_user_send = $id_user
-        order by created_at desc;");
+      $data = DB::select(
+        'CALL get_notificaciones_temp (?);', [$id_user]);
 
       foreach ($data as $e) {
         $nameImage = $e->image;
