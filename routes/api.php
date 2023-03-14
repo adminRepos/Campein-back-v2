@@ -79,7 +79,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/getUsersEvidencias/{id_user}', [EvidenciasController::class, 'getUsersEvidencias']);
     // NOTIFICACIONES
     Route::post('/insertNotificaciones', [NotificacionesController::class, 'insertNotificaciones']);
-    Route::get('/getNotificacionesTemp/{inTipo_user}', [NotificacionesController::class, 'getNotificacionesTemp']);
+    Route::get('/getNotificacionesTemp/{id_user}', [NotificacionesController::class, 'getNotificacionesTemp']);
     // NOTICIAS
     Route::post('/insertNoticia', [NoticiasController::class, 'insertNoticia']);
     Route::get('/selectNoticiasxCampeign/{id_user}', [NoticiasController::class, 'selectNoticias']);

@@ -10,10 +10,13 @@ use App\Models\Notificaciones;
 
 class NotificacionesController extends Controller
 {
-  public function insertNotificaciones(Request $request){
+  public function insertNotificaciones(Request $request)
+  {
     // $body = $request;
     $body = $_REQUEST;
     $files = $_FILES;
+    // obtener el tipo de usuario segun el id
+    $tipo_user_id = DB::select("SELECT rol_id from  users WHERE id = ? ", [intval($body['id_user_send'])]);
 
     $dest_path = "";
 
@@ -47,10 +50,10 @@ class NotificacionesController extends Controller
           }
           if (move_uploaded_file($files['image']['tmp_name'], $dest_path)) {
             $se_movio = true;
-          }else{
+          } else {
             $se_movio = false;
           }
-        }else{
+        } else {
           return response()->json([
             'code' => 400, // warning
             'message' => 'Solo se permite archivos .jpg y .png',
@@ -59,29 +62,43 @@ class NotificacionesController extends Controller
         }
       }
 
-      if($se_movio == true){
+      if ($se_movio == true) {
         // return response()->json([
         //   'code' => 200, // warning
         //   'message' => 'Bonitico',
         // ], 200);
-        $respuesta = DB::select(
-          'CALL insertNotificaciones (?, ?, ?, ?, ?, ?);', 
-          [$body['id_user_send'], $newName, $body['titulo'], $body['mensaje'], $body['tipo_user'], $body['url']]
-        );
-        if($respuesta[0]->id){
+
+        // obtener los id's de usuario segun para enviar la notificacion
+        if ($tipo_user_id[0]->rol_id == 2) {
+          $usuarios_send = DB::select("SELECT id FROM users WHERE rol_id =? ", [intval($body['tipo_user'])]);
+          for ($i = 0; $i < count($usuarios_send); $i++) {
+            $respuesta = DB::select(
+              'CALL insertNotificaciones (?, ?, ?, ?, ?, ?);',
+              [$body['id_user_send'], $newName, $body['titulo'], $body['mensaje'], $usuarios_send[$i]->id, $body['url']]
+            );
+          }
+        }else if ($tipo_user_id[0]->rol_id == 3){
+          $usuarios_send = DB::select("SELECT menor from users_users where mayor = ? ", [intval($body['id_user_send'])]);
+          for ($i = 0; $i < count($usuarios_send); $i++) {
+            $respuesta = DB::select(
+              'CALL insertNotificaciones (?, ?, ?, ?, ?, ?);',
+              [$body['id_user_send'], $newName, $body['titulo'], $body['mensaje'], $usuarios_send[$i]->menor, $body['url']]
+            );
+          }
+        }
+        if ($respuesta[0]->id) {
           return response()->json([
             'code' => 200, // warning
             'message' => 'Se registro correctamente'
           ], 200);
-        }else{
+        } else {
           return response()->json([
             'code' => 500, // warning
             'message' => 'Oops',
             'error' => 'Error SQL'
           ], 500);
         }
-
-      }else{
+      } else {
         return response()->json([
           'code' => 500, // warning
           'message' => 'Ocurrio un fallo subiendo el archivo al servidor',
@@ -96,30 +113,51 @@ class NotificacionesController extends Controller
       ], 400);
     }
   }
-  
-  private function validarCamposInsert($body){
+
+  private function validarCamposInsert($body)
+  {
     return true;
   }
-  
-  public function getNotificacionesTemp(Request $request, $tipo_user){
+
+  public function getNotificacionesTemp(Request $request, $id_user)
+  {
     try {
       //code...
-      $data = DB::select('CALL get_notificaciones_temp(?)', [ intval($tipo_user) ]);
+
+      // obtener listado de notificaciones para mostrar en el portal
+        $data = DB::select("select 
+        n.id,
+        n.id_user_send, 
+            (select concat(u.nombre, ' ', u.apellido) from users as u where u.id = n.id_user_send) as nombre_usuario,
+            (select u.email from users as u where u.id = n.id_user_send) as correo_usuario,
+            n.image, 
+            n.titulo, 
+            n.mensaje, 
+            n.tipo_user, 
+            n.url, 
+            n.created_at,
+            n.Leido
+        from notificaciones as n
+        inner join users as u on u.id = n.id_user_send
+        inner join roles as r on r.id = u.rol_id
+        where r.campeigns_id = 2 and  tipo_user = $id_user or n.id_user_send = $id_user
+        order by created_at desc;");
+
       foreach ($data as $e) {
         $nameImage = $e->image;
-        if($nameImage <> null){
+        if ($nameImage <> null) {
           // $e->image = "test";
-          $dir = '../resources/images/notificaciones/'.$e->image;
+          $dir = '../resources/images/notificaciones/' . $e->image;
           if (file_exists($dir) == false) {
             $e->image = null;
-          }else{
+          } else {
             // Extensión de la imagen
             $type = pathinfo($dir, PATHINFO_EXTENSION);
             // Cargando la imagen
             $img = file_get_contents($dir);
             // Decodificando la imagen en base64
             $base64 = 'data:image/' . $type . ';base64,' . base64_encode($img);
-            $e->image = $base64;          
+            $e->image = $base64;
           }
         }
       }
