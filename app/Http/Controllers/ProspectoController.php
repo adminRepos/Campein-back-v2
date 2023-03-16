@@ -9,7 +9,6 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
-date_default_timezone_set('America/Bogota');
 
 class ProspectoController extends Controller
 {
@@ -94,7 +93,6 @@ class ProspectoController extends Controller
             $intereces = $request->intereces;
             $tipoDocumento = $request->tipoDocumento;
             $localidad = $request->localidad;
-            $created_at = Date("Y-m-d H:i:s");
     
             // Generar consulta
             $strQuery = "CALL insertProspecto(" 
@@ -109,7 +107,6 @@ class ProspectoController extends Controller
                 . "'" . $telefono . "', ";
             $strQuery .= $whatsapp == null ? "NULL," : "'" . $whatsapp . "', ";
             $strQuery .= $user_id . ", "
-                . "'" . $created_at . "', "
                 . "'" . $rangoEdad . "', "
                 . "'" . $longitud . "', "
                 . "'" . $latitud . "', "
