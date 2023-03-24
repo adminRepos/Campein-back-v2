@@ -63,14 +63,14 @@ class NotificacionesController extends Controller
       }
 
       if ($se_movio == true) {
-        // return response()->json([
-        //   'code' => 200, // warning
-        //   'message' => 'Bonitico',
-        // ], 200);
 
-        // obtener los id's de usuario segun para enviar la notificacion
+        // obtener los id's de usuario segun el tipo de usuario y parametros de envio para la notificacion
         if ($tipo_user_id[0]->rol_id == 2) {
-          $usuarios_send = DB::select("SELECT id FROM users WHERE rol_id =? ", [intval($body['tipo_user'])]);
+          if ($body['tipo_user'] == "0") {
+            $usuarios_send = DB::select("SELECT id FROM users WHERE rol_id != 2 and rol_id != 1 ");
+          }else{
+            $usuarios_send = DB::select("SELECT id FROM users WHERE rol_id =? ", [intval($body['tipo_user'])]);
+          }
           for ($i = 0; $i < count($usuarios_send); $i++) {
             $respuesta = DB::select(
               'CALL insertNotificaciones (?, ?, ?, ?, ?, ?);',
@@ -78,12 +78,19 @@ class NotificacionesController extends Controller
             );
           }
         }else if ($tipo_user_id[0]->rol_id == 3){
-          $usuarios_send = DB::select("SELECT menor from users_users where mayor = ? ", [intval($body['id_user_send'])]);
-          for ($i = 0; $i < count($usuarios_send); $i++) {
+          if ($body['tipo_user'] == "0" ) {
+            $usuarios_send = DB::select("SELECT menor from users_users where mayor = ? ", [intval($body['id_user_send'])]);
+            for ($i = 0; $i < count($usuarios_send); $i++) {
+              $respuesta = DB::select(
+                'CALL insertNotificaciones (?, ?, ?, ?, ?, ?);',
+                [$body['id_user_send'], $newName, $body['titulo'], $body['mensaje'], $usuarios_send[$i]->menor, $body['url']]
+              );
+            }
+          }else {
+            $usuarios_send = DB::select("SELECT id FROM users WHERE email = ? ", [($body['email_user_send'])]);
             $respuesta = DB::select(
               'CALL insertNotificaciones (?, ?, ?, ?, ?, ?);',
-              [$body['id_user_send'], $newName, $body['titulo'], $body['mensaje'], $usuarios_send[$i]->menor, $body['url']]
-            );
+              [$body['id_user_send'], $newName, $body['titulo'], $body['mensaje'], $usuarios_send[0]->id, $body['url']]);
           }
         }
         if ($respuesta[0]->id) {
