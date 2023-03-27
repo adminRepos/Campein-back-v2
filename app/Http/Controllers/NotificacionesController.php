@@ -121,6 +121,40 @@ class NotificacionesController extends Controller
     }
   }
 
+  public function confirmReading(Request $request)
+  {
+
+    // $body = $request;
+    $body = $_REQUEST;
+    $tipo_user = DB::select("SELECT tipo_user FROM notificaciones  WHERE id =? ", [intval($body['id_notificacion'])]);
+
+    if ($tipo_user) {
+      if ($tipo_user[0]->tipo_user == $body['id_user']) {
+        try {
+          DB::update('update notificaciones set Leido = 1 where id = ?', [intval($body['id_notificacion'])]);
+          return response()->json([
+            'code' => 200, // warning
+            'data' => "Actualizado correctamente"
+          ], 200);
+        } catch (\Throwable $th) {
+          return response()->json([
+            'code' => 500, // warning
+            'message' => 'Error interno del servidor',
+            'error' => $th
+          ], 500);
+        }
+        
+      }
+    }else{
+      return response()->json([
+        'code' => 400, // warning
+        'error' => 'Validación de campos'
+      ], 400);
+    }
+    
+    
+  }
+
   private function validarCamposInsert($body)
   {
     return true;
