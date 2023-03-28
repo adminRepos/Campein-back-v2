@@ -65,6 +65,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/getUser/{id}', [UsuarioController::class, 'getUser']);
     Route::get('/getUsers/{rol_id}', [UsuarioController::class, 'getUsers']);
     Route::get('/getMyUsers/{rol_id}/{myId}', [UsuarioController::class, 'getMyUsers']);
+    Route::get('/getMyUsersBeta/{rol_id}/{myId}', [UsuarioController::class, 'getMyUsersBeta']);
     Route::get('/getMyUsersActivos/{rol_id}/{myId}', [UsuarioController::class, 'getMyUsersActivos']);
     Route::get('/getRoles', [UsuarioController::class, 'getRoles']);
     Route::get('/getRolesCampeign/{rol_id}', [UsuarioController::class, 'getRolesCampeign']);

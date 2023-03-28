@@ -670,4 +670,32 @@ class UsuarioController extends Controller
     }
   }
 
+
+  public function getMyUsersBeta(Request $request, $rol_id, $myId){
+    $data = [];
+    if($rol_id == 1){
+
+    } else if($rol_id == 2){
+      return response()->json([
+        'code' => 200,
+        'data' => "El administrador no puede usar este servicio"
+      ], 200);
+    } else{
+      $data = DB::select('CALL sp_get_my_users_beta('.$myId.')');
+    }
+
+    if($data){
+      return response()->json([
+      'code' => 200,
+      'data' => $data
+    ], 200);
+    }else {
+      return response()->json([
+        'code' => 200,
+        'data' => $data
+      ], 200);
+    }
+    
+  }
+
 }
