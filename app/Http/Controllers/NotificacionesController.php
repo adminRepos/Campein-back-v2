@@ -131,7 +131,7 @@ class NotificacionesController extends Controller
     if ($tipo_user) {
       if ($tipo_user[0]->tipo_user == $body['id_user']) {
         try {
-          DB::update('update notificaciones set Leido = 1 where id = ?', [intval($body['id_notificacion'])]);
+          DB::update('update notificaciones set leido = 1 where id = ?', [intval($body['id_notificacion'])]);
           return response()->json([
             'code' => 200, // warning
             'data' => "Actualizado correctamente"
