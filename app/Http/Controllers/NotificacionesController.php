@@ -78,7 +78,7 @@ class NotificacionesController extends Controller
             );
           }
         }else if ($tipo_user_id[0]->rol_id == 3){
-          if ($body['tipo_user'] == "0" ) {
+          if ($body['tipo_user'] == "4" ) {
             $usuarios_send = DB::select("SELECT menor from users_users where mayor = ? ", [intval($body['id_user_send'])]);
             for ($i = 0; $i < count($usuarios_send); $i++) {
               $respuesta = DB::select(
@@ -87,10 +87,10 @@ class NotificacionesController extends Controller
               );
             }
           }else {
-            $usuarios_send = DB::select("SELECT id FROM users WHERE email = ? ", [($body['email_user_send'])]);
+            $usuarios_send = [($body['id_user'])];
             $respuesta = DB::select(
               'CALL insertNotificaciones (?, ?, ?, ?, ?, ?);',
-              [$body['id_user_send'], $newName, $body['titulo'], $body['mensaje'], $usuarios_send[0]->id, $body['url']]);
+              [$body['id_user_send'], $newName, $body['titulo'], $body['mensaje'], intval($usuarios_send[0]), $body['url']]);
           }
         }
         if ($respuesta[0]->id) {
