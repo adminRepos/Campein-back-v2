@@ -93,7 +93,15 @@ class ProspectoController extends Controller
             $intereces = $request->intereces;
             $tipoDocumento = $request->tipoDocumento;
             $localidad = $request->localidad;
-    
+
+            //Verificar que la cedula sea unica para hacer el registro de la base de datos
+
+            $consulta_cedula = DB::select("SELECT count(identificacion) as identificacion from prospectos where identificacion = '$identificacion'");
+            if ($consulta_cedula[0]->identificacion > 0){
+                return response()->json([
+                "data" => "Ya existe"
+            ], 200);
+            }
             // Generar consulta
             $strQuery = "CALL insertProspecto(" 
                 . "'" . $identificacion . "', " 
