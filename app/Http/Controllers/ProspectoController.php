@@ -100,7 +100,7 @@ class ProspectoController extends Controller
             if ($consulta_cedula[0]->identificacion > 0){
                 return response()->json([
                 "data" => "Ya existe"
-            ], 200);
+            ], 400);
             }
             // Generar consulta
             $strQuery = "CALL insertProspecto(" 
