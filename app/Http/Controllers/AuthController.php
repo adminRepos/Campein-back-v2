@@ -11,6 +11,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use App\Mail\CorreoElectronico;
 use Illuminate\Support\Facades\Mail;
+use Utilidades;
+
+require 'Utilidades.php';
 
 class AuthController extends Controller
 {
@@ -65,6 +68,9 @@ class AuthController extends Controller
       if($userData->activo == 1){
         $authToken = $userData->createToken('auth_token')->plainTextToken;
 
+        //llenamos el rol id que usa la app
+        $utilidades = new Utilidades();
+        $userData->app_rol_id = $utilidades->tomarRolApp($userData->rol_id);
         
         $nameImage = $userData->image;
         if($nameImage <> null){

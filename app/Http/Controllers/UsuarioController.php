@@ -11,7 +11,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use App\Mail\CorreoElectronico;
 use Illuminate\Support\Facades\Mail;
+use Utilidades;
 
+
+require 'Utilidades.php';
 class UsuarioController extends Controller
 {
 
@@ -45,7 +48,10 @@ class UsuarioController extends Controller
             'image' => $dest_path
           ]);
           // $insert = User::where('email', '=', $body['email']);
-          if(intval($body['rol_id']) == 4) $query = DB::select("INSERT INTO users_users (mayor, menor) VALUES (?, ?);", [intval($body['id_user_session']), intval($newUser->id)]);
+
+          $utilidades = new Utilidades();
+          $rolApp = $utilidades->tomarRolApp(intval($body['rol_id']));
+          if($rolApp == 4) $query = DB::select("INSERT INTO users_users (mayor, menor) VALUES (?, ?);", [intval($body['id_user_session']), intval($newUser->id)]);
           Mail::to($newUser->email)->send(new CorreoElectronico('0',($newUser->nombre . ' ' . $newUser->apellido), 'registroUsuario', $newUser->email, $body['password'], ''));
           return response()->json([
             'code' => 201, // success
@@ -413,13 +419,15 @@ class UsuarioController extends Controller
 
   }
 
+  //recibe el rol del usuario y el id
   public function getMyUsersActivos(Request $request, $rol_id, $myId){
     $data = [];
-    if($rol_id == 1){
+    $utilidades = new Utilidades();
+    $rolApp = $utilidades->tomarRolApp($rol_id);
 
-    } else if($rol_id == 2){
+    if($rolApp == 2){//admin
       $data = DB::select('CALL sp_get_users_campeing('.$rol_id.')');
-    } else{
+    } else{//alfa
       $data = DB::select('CALL sp_get_my_users('.$myId.')');
     }
     $newData = [];
@@ -488,8 +496,10 @@ class UsuarioController extends Controller
 
   public function getUsersAlfa(Request $request, $id_user){
     $user = User::find($id_user);
-    if($user->rol_id == 2){
-      $data = DB::select('CALL select_alfas_admin()');
+    $utilidades = new Utilidades();
+    $rolApp = $utilidades->tomarRolApp($user->rol_id);
+    if($rolApp == 2){
+      $data = DB::select('CALL select_alfas_admin(?)',[$user->id]);
       foreach ($data as $e) {
         $nameImage = $e->image;
         if($nameImage <> null){
@@ -520,8 +530,12 @@ class UsuarioController extends Controller
   
   public function getUsersAlfaData(Request $request, $id_user){
     $user = User::find($id_user);
-    if($user->rol_id == 2){
-      $data = DB::select("SELECT concat(nombre, ' ', apellido) as nombre, id FROM users where (rol_id = 3)");
+    $utilidades = new Utilidades();
+    $rolApp = $utilidades->tomarRolApp($user->rol_id);
+    $idCampana = $utilidades->tomaridCampana($user->rol_id);
+    $rolMenor = $utilidades->tomarIdRolMenor($idCampana);
+    if($rolApp == 2){//solo se permite usuario admin
+      $data = DB::select("SELECT concat(nombre, ' ', apellido) as nombre, id FROM users where (rol_id = ?)",[$rolMenor]);
       return response()->json([
         'data' => $data,
       ], 200);
@@ -534,10 +548,13 @@ class UsuarioController extends Controller
 
   public function getUsersBeta(Request $request, $id_user){
     $user = User::find($id_user);
-    if($user->rol_id == 2){
-      $queryMeta = DB::select('SELECT meta FROM campeigns where id = 2;');
+    $utilidades = new Utilidades();
+    $rolApp = $utilidades->tomarRolApp($user->rol_id);
+    $idCampana = $utilidades->tomaridCampana($user->rol_id);
+    if($rolApp == 2){
+      $queryMeta = DB::select('SELECT meta FROM campeigns where id = ?;',[$idCampana]);
       $meta = $queryMeta[0]->meta;
-      $data = DB::select('CALL select_betas_admin()');
+      $data = DB::select('CALL select_betas_admin(?)',[$user->id]);
       foreach ($data as $e) {
         $nameImage = $e->image;
         if($nameImage <> null){
@@ -643,13 +660,21 @@ class UsuarioController extends Controller
 
   }
 
+  /**
+   * Se usa para ascender un usuario
+   */
   public function upAlfa(Request $request, $id_user){
     try {
       $user = User::find($id_user);
+      //buscamos el rol app
+      $utilidades = new Utilidades();
+      $rolApp = $utilidades->tomarRolApp($user->rol_id);
+      $idCampana = $utilidades->tomaridCampana($user->rol_id);
+      $rolMenor = $utilidades->tomarIdRolMenor($idCampana);
       $message = '';
       $code = 0;
-      if($user->rol_id == 4){
-        $user->rol_id = 3;
+      if($rolApp == 4){
+        $user->rol_id = $rolMenor;
         $user->save();
         $message = 'Usuario ascendido exitosamente';
         $code = 200;

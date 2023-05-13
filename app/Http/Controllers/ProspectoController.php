@@ -152,6 +152,11 @@ class ProspectoController extends Controller
         }
     }
 
+
+    /**
+     * Funcion que trae los intereces por campaña, necesita del id del rol para poder relacionar con la campaña a la cual 
+     * pertenecen los intereses
+     */
     public function getIntereces(Request $request){
         $rol_id = intval($request->rol_id);
         return response()->json([

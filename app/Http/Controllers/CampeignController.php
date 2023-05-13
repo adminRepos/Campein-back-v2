@@ -10,11 +10,13 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Utilidades;
 
 // use Barrydvh\DomPDF\Fecade as PDF;
 use PDF;
 
 // use Barryvdh\DomPDF\Facade\Pdf;
+require 'Utilidades.php';
 
 class CampeignController extends Controller
 {
@@ -93,16 +95,18 @@ class CampeignController extends Controller
     public function getPDF(Request $request, $id_user, $datos){
         try {
             $user = User::find(intval($id_user));
+            $utilidades = new Utilidades();
+            $rolApp = $utilidades->tomarRolApp($user->rol_id);
             $data = null;
             
-            if($datos == 1){
-                if($user->rol_id == 2){
+            if($datos == 1){//reporte usuario alfa
+                if($rolApp == 2){
                     $data = DB::select("CALL get_data_report_admin(?)", [$user->rol_id]);
                 }
-                if($user->rol_id == 3){
+                if($rolApp == 3){
                     $data = DB::select("CALL get_data_report_alfa(?)", [$user->id]);
                 }
-            }else if($datos == 0){
+            }else if($datos == 0){//reporte unico
                 $data = DB::select("CALL get_data_report_user(?)", [$user->id]);
             }
         
@@ -145,13 +149,17 @@ class CampeignController extends Controller
         }
     }
 
-    public function getPDFAdminMobile(Request $request, $rol_id){
+    public function getPDFAdminMobile(Request $request, $id_user, $rol_id){
         try {
             // $user = User::find(intval($id_user));
             $data = null;
             $rol = null;
-            if($rol_id == 'alfa') $rol = 3;
-            if($rol_id == 'beta') $rol = 4;
+            $user = User::find(intval($id_user));
+            $utilidades = new Utilidades();
+            $idCampana = $utilidades->tomaridCampana($user->rol_id);
+            //buscamos el rol app dependiendo de su campana
+            if($rol_id == 'alfa') $rol = $utilidades->tomarIdRolMenor($idCampana);
+            if($rol_id == 'beta') $rol = $utilidades->tomarIdRolMenorBeta($idCampana);
             $data = DB::select("CALL get_data_rol_report_admin(?)", [$rol]);
 
             $dir = '../resources/images/pdfImages/logo-campein.png';

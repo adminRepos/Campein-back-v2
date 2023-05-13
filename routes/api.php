@@ -95,7 +95,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     // reporte pdf mobile
     Route::get('/getPDF/{id_user}/{datos}', [CampeignController::class, 'getPDF']);
-    Route::get('/getPDFAdminMobile/{rol_id}', [CampeignController::class, 'getPDFAdminMobile']);
+    Route::get('/getPDFAdminMobile/{id_user}/{rol_id}', [CampeignController::class, 'getPDFAdminMobile']);
 
     Route::get('/getEvidenciasUsuario/{id_user}', [EvidenciasController::class, 'getEvidenciasUsuario']);
     Route::get('/getReporteEvidenciasUsuario/{id_user}', [EvidenciasController::class, 'getReporteEvidenciasUsuario']);
@@ -109,7 +109,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/getLideresBetaRanking/{id_user}', [EstadisticasController::class, 'getLideresBetaRanking']);
 
     Route::get('/getEstadisticasUsuario/{id_user}', [EstadisticasController::class, 'getEstadisticasUsuario']);
-    Route::get('/getEstadisticasHome', [EstadisticasController::class, 'getEstadisticasHome']);
+    Route::get('/getEstadisticasHome/{id_user}', [EstadisticasController::class, 'getEstadisticasHome']);
     Route::get('/getEstadisticaProspectosMeses/{id_user}/{ano}/{mes}/{hoy}/{ayer}', [EstadisticasController::class, 'getEstadisticaProspectosMeses']);
 
 });

@@ -230,6 +230,7 @@ class EvidenciasController extends Controller
   }
 
 
+  //reporte de evidencias por 1 usuario
   public function getReporteEvidenciasUsuario(Request $request, $id_user){
     try {
       $data = null;
@@ -281,6 +282,7 @@ class EvidenciasController extends Controller
     }
   }
 
+  //reporte de evidencias completo
   public function getReporteEvidencias(Request $request, $id_user){
     try {
       $data = null;

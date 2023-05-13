@@ -9,15 +9,22 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 use PDF;
+use Utilidades;
+
+
+require 'Utilidades.php';
 
 class EstadisticasController extends Controller{
 
     public function getEstadisticasTotalUsuarios(Request $request, $id_user){
         try {
             $user = User::find(intval($id_user));
+            $utilidades = new Utilidades();
+            $idApp = $utilidades->tomarRolApp($user->rol_id);
+            $idCampa = $utilidades->tomaridCampana($user->rol_id);
             $data = null;
-            if($user->rol_id == 2){
-                $data = DB::select('CALL get_estadistica_total_usuarios(?);', [ intval($id_user) ]);
+            if($idApp == 2){
+                $data = DB::select('CALL get_estadistica_total_usuarios(?);', [ intval($idCampa) ]);
             }else{
                 $data = DB::select('CALL get_estadisticas_total_usuarios_betas_x_alfa(?);', [ intval($id_user) ]);
             }
@@ -73,9 +80,20 @@ class EstadisticasController extends Controller{
     public function getLideresBetaRanking(Request $request, $id_user){
         try {
             $user = User::find(intval($id_user));
-            $meta = DB::select("SELECT c.meta from campeigns as c where c.id = 2;");
-            if($user->rol_id == 2){
-                $dataBetas = DB::select("CALL get_estadistica_ranking_prospectos_x_rol_admin(?)", [4]);
+            $utilidades = new Utilidades();
+            $idApp = $utilidades->tomarRolApp($user->rol_id);
+            $idCampa = $utilidades->tomaridCampana($user->rol_id);
+            $rolBeta = $utilidades->tomarIdRolMenorBeta($idCampa);
+
+
+            $utilidades->imprimir($idApp);
+            $utilidades->imprimir($idCampa);
+            $utilidades->imprimir($rolBeta);
+
+            $meta = DB::select("SELECT c.meta from campeigns as c where c.id = ?;", [$idCampa]);
+
+            if($idApp == 2){
+                $dataBetas = DB::select("CALL get_estadistica_ranking_prospectos_x_rol_admin(?)", [$rolBeta]);
             }else{
                 $dataBetas = DB::select("CALL get_estadistica_ranking_prospectos_x_rol(?)", [$id_user]);
             }
@@ -119,9 +137,11 @@ class EstadisticasController extends Controller{
     public function getEstadisticasUsuario(Request $request, $id_user)
     {
         $user = User::find($id_user);
+        $utilidades = new Utilidades();
+        $idApp = $utilidades->tomarRolApp($user->rol_id);
         $data = null;
         
-        if($user->rol_id == 2){
+        if($idApp == 2){
             $data = (object)[
                 'estado' => 'En desarrollo'
             ];
@@ -130,7 +150,7 @@ class EstadisticasController extends Controller{
                 'data' => $data
             ], 200);
         }
-        if($user->rol_id == 3){
+        if($idApp == 3){
             $contBetas = DB::select('SELECT count(id) as conteo from users_users where mayor = ?;', [$user->id]);
             $misFormularios = DB::select('SELECT count(id) as conteo from prospectos as p where p.user_id = ?;', [$user->id]);
             $misEvidencias = DB::select('SELECT count(id) as conteo from evidencias_user as eu where eu.id_user = ?;', [$user->id]);
@@ -200,7 +220,7 @@ class EstadisticasController extends Controller{
                 'data' => $data
             ], 200);
         }
-        if($user->rol_id == 4){
+        if($idApp == 4){
             $misFormularios = DB::select('SELECT count(id) as conteo from prospectos as p where p.user_id = ?;', [$user->id]);
             $misEvidencias = DB::select('SELECT count(id) as conteo from evidencias_user as eu where eu.id_user = ?;', [$user->id]);
             $listaBetas = DB::select("SELECT concat(u.nombre, ' ', u.apellido) as nombre, u.image, (select count(eu.id) from evidencias_user as eu where eu.id_user = u.id) as conteo from users as u where u.rol_id = 4 and (select count(eu.id) from evidencias_user as eu where eu.id_user = u.id) > 0;");
@@ -244,16 +264,24 @@ class EstadisticasController extends Controller{
     }
 
     // Estadisticas de usuarios en ranking
-    public function getEstadisticasHome(Request $request){
+    public function getEstadisticasHome(Request $request, $id_user){
+
+        //buscamos el usuario que esta loggeado
+        $user = User::find($id_user);
+        $utilidades = new Utilidades();
+        $idCampana = $utilidades->tomaridCampana($user->rol_id);
+        $idRolAlfa = $utilidades->tomarIdRolMenor($idCampana);
+        $idRolBeta = $utilidades->tomarIdRolMenorBeta($idCampana);
+
         $date = date("Y-m-d H:i:s", time());
         $mes = date("m",strtotime($date));
         $ano = date("Y",strtotime($date));
 
-        $dataAlfas = DB::select("CALL get_estadistica_ranking_prospectos_x_rol_admin(?)", [3]);
-        $dataBetas = DB::select("CALL get_estadistica_ranking_prospectos_x_rol_admin(?)", [4]);
+        $dataAlfas = DB::select("CALL get_estadistica_ranking_prospectos_x_rol_admin(?)", [$idRolAlfa]);
+        $dataBetas = DB::select("CALL get_estadistica_ranking_prospectos_x_rol_admin(?)", [$idRolBeta]);
 
         $stringDate = $ano . '-' . $mes . '-01 00:00:00';
-        $dataMes = DB::select("CALL get_estadistica_lider_destacado_mes(?)", [$stringDate]);
+        $dataMes = DB::select("CALL get_estadistica_lider_destacado_mes_new(?, ?)", [$stringDate, $idCampana]);
 
         $objetoRanking = null;
 

@@ -24,6 +24,7 @@ class User extends Authenticatable
         'activo',
         'password',
         'rol_id',
+        'app_rol_id',
         'image',
         'fecha_nacimiento'
     ];
