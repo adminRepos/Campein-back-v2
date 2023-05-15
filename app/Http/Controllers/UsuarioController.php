@@ -98,7 +98,9 @@ class UsuarioController extends Controller
                 'image' => $newName
               ]);
               // $insert = User::where('email', '=', $body['email']);
-              if(intval($body['rol_id']) == 4) $query = DB::select("INSERT INTO users_users (mayor, menor) VALUES (?, ?);", [intval($body['id_user_session']), intval($newUser->id)]);
+              $utilidades = new Utilidades();
+              $rolApp = $utilidades->tomarRolApp(intval($body['rol_id']));
+              if($rolApp == 4) $query = DB::select("INSERT INTO users_users (mayor, menor) VALUES (?, ?);", [intval($body['id_user_session']), intval($newUser->id)]);
               Mail::to($newUser->email)->send(new CorreoElectronico('0',($newUser->nombre . ' ' . $newUser->apellido), 'registroUsuario', $newUser->email, $body['password'], ''));
               return response()->json([
                 'code' => 201, // success
