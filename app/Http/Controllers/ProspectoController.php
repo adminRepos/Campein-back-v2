@@ -93,6 +93,7 @@ class ProspectoController extends Controller
             $intereces = $request->intereces;
             $tipoDocumento = $request->tipoDocumento;
             $localidad = $request->localidad;
+            $puestoVotacion = $request->puesto_votacion;
 
             //Verificar que la cedula sea unica para hacer el registro de la base de datos
 
@@ -119,7 +120,8 @@ class ProspectoController extends Controller
                 . "'" . $longitud . "', "
                 . "'" . $latitud . "', "
                 . "'" . $tipoDocumento . "', "
-                . "'" . $localidad . "');";
+                . "'" . $localidad . "', "
+                . "'" . $puestoVotacion . "');";
             // Ejecutar consulta 
             $consulta = DB::select($strQuery);
             // Retomamos el id para registrar los intereces 
