@@ -462,9 +462,9 @@ class UsuarioController extends Controller
 
   public function getMyUsers(Request $request, $rol_id, $myId){
     $data = [];
-    if($rol_id == 1){
-
-    } else if($rol_id == 2){
+    $utilidades = new Utilidades();
+    $rolApp = $utilidades->tomarRolApp($rol_id);
+    if($rolApp == 2){
       $data = DB::select('CALL sp_get_users_campeing('.$rol_id.')');
     } else{
       $data = DB::select('CALL sp_get_my_users('.$myId.')');
@@ -488,7 +488,8 @@ class UsuarioController extends Controller
         }
       }
     }
-    $queryMeta = DB::select("SELECT meta from campeigns where id = 2;");
+    $idCampana = $utilidades->tomaridCampana($rol_id);
+    $queryMeta = DB::select("SELECT meta from campeigns where id = ?;", [$idCampana]);
     return response()->json([
       'code' => 200,
       'data' => $data,
@@ -611,6 +612,9 @@ class UsuarioController extends Controller
 
   public function getUserGestion(Request $request, $id_user){
     try {
+      $utilidades = new Utilidades();
+      $user = User::find($id_user);
+      $idCampana = $utilidades->tomaridCampana($user->rol_id);
       $dataUser = DB::select("SELECT 
           u.id,
           u.activo,
@@ -644,7 +648,7 @@ class UsuarioController extends Controller
           }
         }
       }
-      $queryMeta = DB::select("SELECT meta from campeigns where id = 2;");
+      $queryMeta = DB::select("SELECT meta from campeigns where id = ?;", [$idCampana]);
       return response()->json([
         'code' => 200,
         'meta' => $queryMeta[0]->meta,

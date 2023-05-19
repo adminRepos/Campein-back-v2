@@ -202,13 +202,15 @@ class CampeignController extends Controller
     public function getDataExcel(Request $request, $id_user, $datos){
         try {
             $user = User::find(intval($id_user));
+            $utilidades = new Utilidades();
+            $rolApp = $utilidades->tomarRolApp($user->rol_id);
             $data = null;
             
             if($datos == 1){
-                if($user->rol_id == 2){
+                if($rolApp == 2){
                     $data = DB::select("CALL get_data_report_admin(?)", [$user->rol_id]);
                 }
-                if($user->rol_id == 3){
+                if($rolApp== 3){
                     $data = DB::select("CALL get_data_report_alfa(?)", [$user->id]);
                 }
             }else if($datos == 0){
