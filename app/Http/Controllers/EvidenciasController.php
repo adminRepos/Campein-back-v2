@@ -380,6 +380,10 @@ class EvidenciasController extends Controller
   // get_report_xls_evidencias_x_usuario
   public function getXlsEvidencias(Request $request, $id_user, $isLeader){
     try {
+      $user = User::find(intval($id_user));
+      $utilidades = new Utilidades();
+      $rolApp = $utilidades->tomarRolApp($user->rol_id);
+      $idCampana = $utilidades->tomaridCampana($user->rol_id);
       $query = null;
       if($isLeader == 0){
         $query = DB::select("SELECT 
@@ -391,7 +395,7 @@ class EvidenciasController extends Controller
           where e.id_user = ?;", [intval($id_user)]);
       }else{
         $user = User::find(intval($id_user));
-        if($user->rol_id == 2){
+        if($rolApp == 2){
           $query = DB::select("SELECT 
             concat(u.nombre, ' ', u.apellido) as user,
             e.red_social,
@@ -401,7 +405,7 @@ class EvidenciasController extends Controller
           from evidencias_user as e
           inner join users as u on u.id = e.id_user
           inner join roles as r on r.id = u.rol_id
-          where r.campeigns_id = 2 and r.id <> 2;");
+          where r.campeigns_id = ? and r.id <> ?;", [$idCampana, $user->rol_id]);
         }else{
           $query = DB::select("SELECT 
             concat(u.nombre, ' ', u.apellido) as user,
