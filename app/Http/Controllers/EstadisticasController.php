@@ -44,8 +44,12 @@ class EstadisticasController extends Controller{
     public function getPorcentajesProspectosXRol(Request $request, $id_user){
         try {
             // $user = User::find(intval($id_user));
-            $data = DB::select('CALL get_estadisticas_porcentajes_prospectos_x_rol(?);', [ intval($id_user) ]);
-            $total = intval($data[0]->alfas) + intval($data[0]->betas);
+            $user = User::find(intval($id_user));
+            $utilidades = new Utilidades();
+            $idCampa = $utilidades->tomaridCampana($user->rol_id);
+            $data = DB::select('CALL get_estadisticas_porcentajes_prospectos_x_rol(?);', [ intval($idCampa) ]);
+            
+            $total = intval($data[0]->alfas) + intval($data[0]->betas) + intval($data[0]->adin);
             $return = array((object)['total'=>$total, 'alfas' => $data[0]->alfas, 'betas' => $data[0]->betas]);
             return response()->json([
                 'code' => 200, // warning
