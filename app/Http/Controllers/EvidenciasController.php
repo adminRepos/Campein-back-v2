@@ -7,6 +7,10 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use PDF;
+use Utilidades;
+
+require 'Utilidades.php';
+
 
 /**
  * Controlador de las evidencias
@@ -141,10 +145,18 @@ class EvidenciasController extends Controller
 
   public function getUsersEvidencias(Request $request, $id_user){
     $user = User::find(intval($id_user));
+    $utilidades = new Utilidades();
+    $rolApp = $utilidades->tomarRolApp($user->rol_id);
+    $idCampana = $utilidades->tomaridCampana($user->rol_id);
+
     $data = null;
-    $queryMeta = DB::select('SELECT meta_evidencias from campeigns where id = 2');
-    if($user->rol_id == 2) {$data = DB::select('CALL get_dataTable_users_evidencias_admin(?)', [$user->rol_id]);}
-    if($user->rol_id == 3) {$data = DB::select('CALL get_dataTable_users_evidencias(?)', [$user->id]);}
+    $queryMeta = DB::select('SELECT meta_evidencias from campeigns where id = ?;', [$idCampana]);
+    
+    if($rolApp == 2) {
+      $data = DB::select('CALL get_dataTable_users_evidencias_admin(?)', [$user->rol_id]);
+    }else if($rolApp == 3) {
+      $data = DB::select('CALL get_dataTable_users_evidencias(?)', [$user->id]);
+    }
 
     foreach ($data as $e) {
       $nameImage = $e->image;

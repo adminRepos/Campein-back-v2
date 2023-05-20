@@ -20,7 +20,7 @@ class Utilidades
     }
   }
 
-  //trae el valor del id de la campana usando el id de un usuario
+  //trae el valor del id de la campana usando el id del rol de un usuario
   public function tomaridCampana($idRol)
   {
     $rolApp = DB::select("SELECT r.campeigns_id from roles as r where r.id = ? limit 1;", [$idRol]);

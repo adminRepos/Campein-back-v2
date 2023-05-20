@@ -71,8 +71,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/getRolesCampeign/{rol_id}', [UsuarioController::class, 'getRolesCampeign']);
     
     Route::get('/getUserGestion/{id_user}', [UsuarioController::class, 'getUserGestion']);
-    Route::get('/cambioMeta/{numero}', [CampeignController::class, 'cambioMeta']);
-    Route::get('/cambioMetaEvidencias/{numero}', [CampeignController::class, 'cambioMetaEvidencias']);
+    Route::get('/cambioMeta/{id_user}/{numero}', [CampeignController::class, 'cambioMeta']);
+    Route::get('/cambioMetaEvidencias/{id_user}/{numero}', [CampeignController::class, 'cambioMetaEvidencias']);
     // reporte Excel
     Route::get('/getDataExcel/{id_user}/{datos}', [CampeignController::class, 'getDataExcel']);
     Route::get('/getDataExcelAdminMobile/{rol_id}', [CampeignController::class, 'getDataExcelAdminMobile']);

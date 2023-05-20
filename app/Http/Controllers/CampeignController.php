@@ -256,9 +256,12 @@ class CampeignController extends Controller
         }
     }
 
-    public function cambioMeta(Request $request, $numero){
+    public function cambioMeta(Request $request, $id_user, $numero){
         try {
-            $query = DB::select("UPDATE campeigns SET meta = ? WHERE id = 2;", [intval($numero)]);
+            $user = User::find(intval($id_user));
+            $utilidades = new Utilidades();
+            $rolCampana = $utilidades->tomaridCampana($user->rol_id);
+            $query = DB::select("UPDATE campeigns SET meta = ? WHERE id = ?;", [intval($numero), $rolCampana]);
             return response()->json([
                 'code' => 200, // succes
                 'data' => 'full',
@@ -272,9 +275,12 @@ class CampeignController extends Controller
         }
     }
 
-    public function cambioMetaEvidencias(Request $request, $numero){
+    public function cambioMetaEvidencias(Request $request, $id_user, $numero){
         try {
-            $query = DB::select("UPDATE campeigns SET meta_evidencias = ? WHERE id = 2;", [intval($numero)]);
+            $user = User::find(intval($id_user));
+            $utilidades = new Utilidades();
+            $rolCampana = $utilidades->tomaridCampana($user->rol_id);
+            $query = DB::select("UPDATE campeigns SET meta_evidencias = ? WHERE id = ?;", [intval($numero), $rolCampana]);
             return response()->json([
                 'code' => 200, // succes
                 'data' => 'full',
