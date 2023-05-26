@@ -66,8 +66,10 @@ class EstadisticasController extends Controller{
 
     public function getEstadisticaLocalidades(Request $request, $id_user){
         try {
-            // $user = User::find(intval($id_user));
-            $data = DB::select('CALL get_estadisticas_localidades();');
+            $user = User::find(intval($id_user));
+            $utilidades = new Utilidades();
+            $idCampa = $utilidades->tomaridCampana($user->rol_id);
+            $data = DB::select('CALL get_estadisticas_localidades(?);',[ intval($idCampa) ]);
             return response()->json([
                 'code' => 200, // warning
                 'data' => $data
