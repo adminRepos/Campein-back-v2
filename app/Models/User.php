@@ -23,6 +23,7 @@ class User extends Authenticatable
         'whatsapp',
         'activo',
         'password',
+        'direccion',
         'rol_id',
         'app_rol_id',
         'image',
