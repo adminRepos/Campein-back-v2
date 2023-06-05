@@ -8,6 +8,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Noticias;
 use App\Models\User;
+use Utilidades;
+
+
+require 'Utilidades.php';
 
 class NoticiasController extends Controller
 {
@@ -48,7 +52,6 @@ class NoticiasController extends Controller
             $rol_id = $user->rol_id;
             // $campeign = DB::select("select campeigns_id from roles where id = $rol_id;");
 
-
             $numero = DB::select('SELECT COUNT(*) as conteo FROM noticias;');
             $se_movio = false;
             $nombre_archivo = $files['imagen']['name'];
@@ -85,8 +88,8 @@ class NoticiasController extends Controller
 
             if($se_movio == true){ // camino correcto
                 $respuesta = DB::select(
-                    'CALL insertNoticia (?, ?, ?, ?, ?);', 
-                    [$body['id_user_send'], $body['titulo'], $body['mensaje'], $url, $newName]
+                    'CALL insertNoticia (?, ?, ?, ?, ?, ?);', 
+                    [$body['id_user_send'], $body['titulo'], $body['mensaje'], $url, $newName, $body['fecha_finalizacion']]
                 );
                 if($respuesta[0]->id){
                 return response()->json([
@@ -118,10 +121,24 @@ class NoticiasController extends Controller
 
     }
 
+    //Funciona que toma las noticias de una campaña si es un admin o inspirador
+    //o las del inspirador si es un multiplicador
     public function selectNoticias(Request $request)
     {
         $id = intval($request->id_user);
-        $data = DB::select('CALL get_noticias_x_campeign(?)', [$id]);
+        $utilidades = new Utilidades();
+        $user = User::find($request->id_user);
+        $rolApp = $utilidades->tomarRolApp($user->rol_id);
+        
+        $currentDate = date('Y-m-d');
+        
+        if($rolApp == 4){//si es multiplicador
+            $data = DB::select('CALL get_noticias_x_campeign_multiplicador(?, ?)', [$id, $currentDate]);
+        }else if ($rolApp == 3){//si es multiplicador
+            $data = DB::select('CALL get_noticias_x_campeign_inspirador(?, ?)', [$id, $currentDate]);
+        }else{//admin - ven todas las noticias por campaña
+            $data = DB::select('CALL get_noticias_x_campeign(?, ?)', [$id, $currentDate]);
+        }
         foreach ($data as $e) {
             $nameImage = $e->imagen;
             if($nameImage <> null){
