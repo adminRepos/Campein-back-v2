@@ -27,7 +27,8 @@ class User extends Authenticatable
         'rol_id',
         'app_rol_id',
         'image',
-        'fecha_nacimiento'
+        'fecha_nacimiento',
+        'id_formulario'
     ];
 
     protected $hidden = [

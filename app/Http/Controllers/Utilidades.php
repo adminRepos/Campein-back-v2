@@ -31,6 +31,17 @@ class Utilidades
     }
   }
 
+  //funcion que trae el id del formulario
+  public function tomaridFormulario($idCampana)
+  {
+    $idForm = DB::select("SELECT c.id_formulario from campeigns as c where c.id = ?;", [$idCampana]);
+    if (!empty($idForm)) {
+      return $idForm[0]->id_formulario;
+    } else {
+      return 0;
+    }
+  }
+
   //solo selecciona rol alfa usando el id de una campana en especifico
   public function tomarIdRolMenor($idCampana)
   {

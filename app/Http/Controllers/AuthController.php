@@ -71,6 +71,9 @@ class AuthController extends Controller
         //llenamos el rol id que usa la app
         $utilidades = new Utilidades();
         $userData->app_rol_id = $utilidades->tomarRolApp($userData->rol_id);
+
+        $idCampa = $utilidades->tomaridCampana($userData->rol_id);
+        $userData->id_formulario = $utilidades->tomaridFormulario($idCampa);
         
         $nameImage = $userData->image;
         if($nameImage <> null){
