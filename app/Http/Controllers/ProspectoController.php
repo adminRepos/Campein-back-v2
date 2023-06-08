@@ -95,6 +95,10 @@ class ProspectoController extends Controller
             $localidad = $request->localidad;
             $puestoVotacion = $request->puesto_votacion;
 
+            $fechaNacimiento = $request->fecha_nacimiento;
+            $piensaVotar = $request->piensa_votar;
+            $textoExtra = $request->texto_extra;
+
             //Verificar que la cedula sea unica para hacer el registro de la base de datos
 
             $consulta_cedula = DB::select("SELECT count(identificacion) as identificacion from prospectos where identificacion = '$identificacion'");
@@ -121,7 +125,10 @@ class ProspectoController extends Controller
                 . "'" . $latitud . "', "
                 . "'" . $tipoDocumento . "', "
                 . "'" . $localidad . "', "
-                . "'" . $puestoVotacion . "');";
+                . "'" . $puestoVotacion . "', "
+                . "'" . $fechaNacimiento . "', "
+                . "'" . $piensaVotar . "', "
+                . "'" . $textoExtra . "');";
             // Ejecutar consulta 
             $consulta = DB::select($strQuery);
             // Retomamos el id para registrar los intereces 
@@ -130,17 +137,21 @@ class ProspectoController extends Controller
             $strQuery = "insert into intereces_prospecto (prospecto_id, interes_id) values ";
             $i = 0;
             $count = count($intereces);
-            foreach ($intereces as $i) {
-                $strQuery .= "(" . $lastInsertID . ", " . $i . ")";
-                if($i <= $count){
-                    $strQuery .= ",";
-                }else{
-                    $strQuery .= ";";
+            //se valida que tenga intereses ya que hay un formulario que no pide
+            if ($count !== 0) {
+                foreach ($intereces as $i) {
+                    $strQuery .= "(" . $lastInsertID . ", " . $i . ")";
+                    if($i <= $count){
+                        $strQuery .= ",";
+                    }else{
+                        $strQuery .= ";";
+                    }
+                    $i++;
                 }
-                $i++;
+                // Ejecutar consulta            
+                $insertIntereces = DB::select($strQuery);
             }
-            // Ejecutar consulta
-            $insertIntereces = DB::select($strQuery);
+            
             // Response
             return response()->json([
                 "data" => "El prospecto se registro correctamente"
