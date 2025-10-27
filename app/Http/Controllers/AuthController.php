@@ -16,6 +16,13 @@ class AuthController extends Controller
 {
 
   // public function register(UserRegisterRequest $request)
+  /**
+   * @OA\Post(
+   *   path="/api/register",
+   *   summary="Registro de usuario sin authentificación previa",
+   *   @OA\Response(response=200, description="OK")
+   * )
+   */
   public function register(Request $request){
     $requestValidate = $request->validate([
       'nombre' => 'required|string',
@@ -47,6 +54,13 @@ class AuthController extends Controller
   }
 
 
+  /**
+   * @OA\Post(
+   *   path="/api/login",
+   *   summary="Login de usuario",
+   *   @OA\Response(response=200, description="OK")
+   * )
+   */
   public function login(Request $request){
     // try {
       //code...
@@ -112,6 +126,13 @@ class AuthController extends Controller
     ], 200);
   }
   
+  /**
+   * @OA\Get(
+   *   path="/api/resetPass/{email}/{date}",
+   *   summary="Enviar email para reestablecer contraseña",
+   *   @OA\Response(response=200, description="OK")
+   * )
+   */
   public function resetPass(Request $request, $email, $date){
     try {
       $userData = User::where('email', '=', $email)->first();
@@ -139,6 +160,13 @@ class AuthController extends Controller
 
   }
 
+  /**
+   * @OA\Post(
+   *   path="/api/resetPass",
+   *   summary="Restablecimiento de contraseña",
+   *   @OA\Response(response=200, description="OK")
+   * )
+   */
   public function changePass(Request $request){
     // $body = $_REQUEST;
     if($request->get('pass') == $request->get('confPass')){
